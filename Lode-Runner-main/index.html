@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lode Runner - Andrei Cretu & Alexandru Cuica</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="map.js"></script>
+    <script src="ui.js"></script>
+    <script>
+      var objCanvas = null;
+      var objC2D = null;
+      var objCycle = null;
+      var tabObjWalls = null;
+
+      function initAnimation() {
+        objCanvas = document.getElementById("canvas");
+        objCanvas.focus();
+        objC2D = objCanvas.getContext("2d");
+        initUI();
+        initWalls();
+        initMap();
+        drawWalls();
+      }
+
+      function animer(){
+        objCycle = requestAnimationFrame(animer);
+
+        eraseDrawing();
+        updateAnimation();
+        draw();
+      }
+
+      function stopAnimation(){
+        if(objCycle != null){
+          cancelAnimationFrame(objCycle);
+          objCycle = null;
+        }
+      }
+
+      function eraseDrawing(){
+        objC2D.clearRect(0, 0, objCanvas.width, objCanvas.height);
+      }
+
+    </script>
+  </head>
+  <body onload="initAnimation()">
+    <h1>Lode Runner - Andrei Cretu & Alexandru Ciuca</h1>
+    <canvas id="canvas" width="1892px" height="1488px"></canvas>
+  </body>
+</html>
