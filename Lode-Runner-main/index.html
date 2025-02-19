@@ -7,11 +7,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <script src="map.js"></script>
     <script src="ui.js"></script>
+    <script src="timer.js"></script>
     <script>
       var objCanvas = null;
       var objC2D = null;
       var objCycle = null;
       var tabObjWalls = null;
+      var timeEnMarche = false;
 
       function initAnimation() {
         objCanvas = document.getElementById("canvas");
@@ -22,7 +24,6 @@
         initMap();
         drawWalls();
       }
-
       function animate(){
         objCycle = requestAnimationFrame(animate);
 
