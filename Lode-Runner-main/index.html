@@ -21,6 +21,7 @@
       var player = null;
       var playerX = null;
       var playerY = null;
+      var timeEnMarche = false;
 
       function initAnimation() {
         objCanvas = document.getElementById("canvas");
@@ -34,7 +35,7 @@
         drawWalls();
       }
 
-      function animate() {
+      function animate(){
         objCycle = requestAnimationFrame(animate);
 
         eraseDrawing();
