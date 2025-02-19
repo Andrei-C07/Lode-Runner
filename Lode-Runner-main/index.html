@@ -4,26 +4,37 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lode Runner</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
     <script src="map.js"></script>
     <script src="ui.js"></script>
+    <script src="player.js"></script>
     <script>
       var objCanvas = null;
       var objC2D = null;
       var objCycle = null;
       var tabObjWalls = null;
+      var spawnX = null;
+      var spawnY = null;
+      var player = null;
+      var playerX = null;
+      var playerY = null;
 
       function initAnimation() {
         objCanvas = document.getElementById("canvas");
         objCanvas.focus();
         objC2D = objCanvas.getContext("2d");
+
         initUI();
         initWalls();
         initMap();
+        initPlayer();
         drawWalls();
       }
 
-      function animate(){
+      function animate() {
         objCycle = requestAnimationFrame(animate);
 
         eraseDrawing();
@@ -31,20 +42,24 @@
         draw();
       }
 
-      function stopAnimation(){
-        if(objCycle != null){
+      function stopAnimation() {
+        if (objCycle != null) {
           cancelAnimationFrame(objCycle);
           objCycle = null;
         }
       }
 
-      function eraseDrawing(){
+      function eraseDrawing() {
         objC2D.clearRect(0, 0, objCanvas.width, objCanvas.height);
       }
-
     </script>
   </head>
   <body onload="initAnimation()">
-    <canvas id="canvas" width="1892px" height="1488px"></canvas>
+    <canvas
+      id="canvas"
+      width="1892px"
+      height="1488px"
+      onkeydown="movePlayer()"
+    ></canvas>
   </body>
 </html>

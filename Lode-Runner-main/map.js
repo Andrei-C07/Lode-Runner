@@ -13,6 +13,7 @@
         // r = rope
         // p = pavement
         // g = gold
+        // S = spawn
 
 
         let map = [
@@ -30,7 +31,7 @@
             ["v","v","v","v","v","v","v","v","v","l","v","v","v","v","v","v","v","v","v","v","l","v","v","v","v","v","v","v"],
             ["v","v","v","v","v","v","v","g","v","l","r","r","r","r","r","r","r","r","r","r","l","v","v","v","g","v","v","v"],
             ["v","v","v","v","l","b","b","b","b","b","b","v","v","v","v","v","v","v","v","v","b","b","b","b","b","b","b","l"],
-            ["v","v","v","v","l","v","v","v","v","v","v","v","v","v","v","v","v","v","g","v","v","v","v","v","v","v","v","l"],
+            ["v","v","v","v","l","v","v","v","v","v","v","v","v","v","S","v","v","v","g","v","v","v","v","v","v","v","v","l"],
             ["b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b"],
             ["p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p"]
         ];
@@ -43,11 +44,16 @@
             let drawVoid = () => {
                 for (let i = 0; i < map.length; i++){
                     for(let j = 0; j < map[i].length; j++){
-                        if(map[i][j] == "v"){
+                        if(map[i][j] == "v" || map[i][j] == "S"){
+
+                            if(map[i][j] == "S"){
+                                spawnX = j * (mapWidth / map[i].length);
+                                spawnY = i * (mapHeight / map.length);
+                            }
                             
                             const cellHeight = mapHeight / map.length;
                             const cellWidth = mapWidth / map[i].length;
-                            objC2D.drawImage(voidTexture, j * cellWidth, i * cellHeight, cellWidth, cellHeight)
+                            objC2D.drawImage(voidTexture, j * cellWidth, i * cellHeight)
                                 
                         }
                     }
@@ -68,7 +74,7 @@
                         if(map[i][j] == "b"){
                             const cellHeight = mapHeight / map.length;
                             const cellWidth = mapWidth / map[i].length;
-                            objC2D.drawImage(brickTexture, j * cellWidth, i * cellHeight, cellWidth, cellHeight)
+                            objC2D.drawImage(brickTexture, j * cellWidth, i * cellHeight)
                         }
                     }
                 }
@@ -88,7 +94,7 @@
                         if(map[i][j] == "l"){
                             const cellHeight = mapHeight / map.length;
                             const cellWidth = mapWidth / map[i].length;
-                            objC2D.drawImage(ladderTexture, j * cellWidth, i * cellHeight, cellWidth, cellHeight)
+                            objC2D.drawImage(ladderTexture, j * cellWidth, i * cellHeight)
                         }
                     }
                 }
@@ -108,7 +114,7 @@
                         if(map[i][j] == "r"){
                             const cellHeight = mapHeight / map.length;
                             const cellWidth = mapWidth / map[i].length;
-                            objC2D.drawImage(ropeTexture, j * cellWidth, i * cellHeight, cellWidth, cellHeight)
+                            objC2D.drawImage(ropeTexture, j * cellWidth, i * cellHeight)
                         }
                     }
                 }
@@ -128,7 +134,7 @@
                         if(map[i][j] == "p"){
                             const cellHeight = mapHeight / map.length;
                             const cellWidth = mapWidth / map[i].length;
-                            objC2D.drawImage(pavementTexture, j * cellWidth, i * cellHeight, cellWidth, cellHeight)
+                            objC2D.drawImage(pavementTexture, j * cellWidth, i * cellHeight)
                         }
                     }
                 }
@@ -148,7 +154,7 @@
                     if(map[i][j] == "g"){
                         const cellHeight = mapHeight / map.length;
                         const cellWidth = mapWidth / map[i].length;
-                        objC2D.drawImage(goldTexture, j * cellWidth, i * cellHeight, cellWidth, cellHeight)
+                        objC2D.drawImage(goldTexture, j * cellWidth, i * cellHeight)
                     }
                 }
             }
