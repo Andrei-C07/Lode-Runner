@@ -16,24 +16,43 @@
       var objCanvas = null;
       var objC2D = null;
       var objCycle = null;
+      var UIcolor = null;
+
+      var map = null;
+      var mapWidth = null;
+      var mapHeight = null;
+      var objTexture = null;
       var tabObjWalls = null;
-      var spawnX = null;
-      var spawnY = null;
-      var player = null;
-      var playerX = null;
-      var playerY = null;
+      var spawnX = 946;
+      var spawnY = 996;
+
+      var objImgPlayer = null;
+      var objPlayer = null;
+
+      var strMembers = null;
+      var strTitle = null;
+      var strScore = null;
       var timeEnMarche = false;
+      var strTime = null
+      var strLvl = null;
+      var strLives = null;
 
       function initAnimation() {
         objCanvas = document.getElementById("canvas");
         objCanvas.focus();
         objC2D = objCanvas.getContext("2d");
-
         initUI();
         initWalls();
         initMap();
         initPlayer();
+        draw();
+      }
+
+      function draw(){
+        drawUI();
         drawWalls();
+        drawMap();
+        drawPlayer();
       }
 
       function animate(){
@@ -42,6 +61,9 @@
         eraseDrawing();
         updateAnimation();
         draw();
+      }
+
+      function updateAnimation(){
       }
 
       function stopAnimation() {
@@ -61,7 +83,8 @@
       id="canvas"
       width="1892px"
       height="1488px"
-      onkeydown="movePlayer()"
+      tabIndex="1"
+      onkeydown="movePlayer(); return false"
     ></canvas>
   </body>
 </html>

@@ -27,8 +27,8 @@ function startTimer() {
 
 function updateUITimer() {
 
-  const timerX = objCanvas.width / 2.5 - 162;
-  const timerY = objCanvas.height - 260;
+  const timerX = objCanvas.width / 2.5 - 112;
+  const timerY = objCanvas.height - 160;
   const timerWidth = 500;
   const timerHeight = 50;
 
