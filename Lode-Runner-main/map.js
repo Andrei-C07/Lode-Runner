@@ -42,7 +42,7 @@ function initMap(){
     console.log("Textures initialized");
 }
 
-function drawMap(){
+function drawMap() {
     const offsetX = 50;
     const offsetY = 100;
     objC2D.fillStyle = "black";
@@ -51,16 +51,17 @@ function drawMap(){
     const cellHeight = mapHeight / map.length;
     const cellWidth = mapWidth / map[0].length;
 
-    for (let i = 0; i < map.length; i++){
-        for(let j = 0; j < map[i].length; j++){
+    for (let i = 0; i < map.length; i++) {
+        for (let j = 0; j < map[i].length; j++) {
             let texture = textures[map[i][j]];
             if (texture && texture.complete) {
-                objC2D.drawImage(texture, j * cellWidth + offsetX, i * cellHeight + offsetY);
+                objC2D.drawImage(texture, j * cellWidth + offsetX, i * cellHeight + offsetY, cellWidth, cellHeight);
             }
         }
     }
-    console.log("Map drawn");
+    //console.log("Map drawn");
 }
+
 
 
 
