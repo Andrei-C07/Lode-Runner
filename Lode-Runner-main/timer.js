@@ -20,13 +20,12 @@ function startTimer() {
     }
 
     timer = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    console.log(timer); 
+    strTime = timer;
     updateUITimer();
   }, 1000);
 }
 
 function updateUITimer() {
-
   const timerX = objCanvas.width / 2.5 - 112;
   const timerY = objCanvas.height - 160;
   const timerWidth = 500;
@@ -39,6 +38,7 @@ function updateUITimer() {
   objC2D.font = "35px 'Press Start 2P'";
   objC2D.fillStyle = "yellow";
   objC2D.fillText("Temps:" + timer, timerX + 20, timerY);
+  drawDynamicUI();
 }
 
 document.addEventListener('keydown', (event) => {

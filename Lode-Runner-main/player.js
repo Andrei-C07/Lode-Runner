@@ -70,6 +70,7 @@ function movePlayer(){
         objPlayer.playerIntX += objPlayer.playerSpeed * objPlayer.playerDirection;
         redessinerMursMap();
         drawPlayer();
+        checkGoldPickup();
     }
 
     if(binMoveableY){
@@ -77,6 +78,7 @@ function movePlayer(){
         objPlayer.playerIntY += objPlayer.playerSpeed * objPlayer.playerDirection ;
         redessinerMursMap();
         drawPlayer();
+        checkGoldPickup();
     }
     console.log(objPlayer.playerIntX, objPlayer.playerIntY, gridX, gridY, currentTile);
     console.log(tileUnderPlayer);
@@ -114,4 +116,14 @@ function redessinerMursMap() {
     drawMap(); 
     //drawWalls(); 
     objC2D.restore();
+}
+
+function checkGoldPickup(){
+    let { gridX, gridY } = playerPosOnMap();
+
+    if (map[gridY] && map[gridY][gridX] === "g") {
+
+        map[gridY][gridX] = "v";
+        miseAJourScore(250);
+    }
 }
