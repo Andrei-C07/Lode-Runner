@@ -1,8 +1,8 @@
+//initialiser le joueur
 function initPlayer(){
     objImgPlayer = new Image();
     objImgPlayer.src = "assets/player/playerIDLE.png";
     objPlayer = new Object();
-    //Onload pour executer la fonction draw() seulement quand l'image est chargée
     objImgPlayer.onload = function(){
         console.log("Player loaded");
         draw();
@@ -10,108 +10,120 @@ function initPlayer(){
     objPlayer.imgPlayer = objImgPlayer;
     objPlayer.playerIntX = spawnX;
     objPlayer.playerIntY = spawnY;
-    objPlayer.width = 40;
+    objPlayer.width = 30;
     objPlayer.height = 64;
     objPlayer.playerSpeed = 6.4;
     objPlayer.playerDirection = 0;
 }
 
+//Dessiner le joueur
 function drawPlayer(){
     objC2D.save();
-    
+    drawPlayerHitBox();
     objC2D.drawImage(objPlayer.imgPlayer, objPlayer.playerIntX, objPlayer.playerIntY);
     objC2D.restore();
 }
 
+//Faire bouger le joueur
 function movePlayer(){
-    var binMoveableX = false;
-    var binMoveableY = false;
+    let binMoveLeft = false;
+    let binMoveRight = false;
+    let binMoveUp = false;
+    let binMoveDown = false;
+    let gravitySpeed = 4;
 
-    let { gridX, gridY } = playerPosOnMap();
-    let currentTile = map[gridY] && map[gridY][gridX];
-    let tileUnderPlayer = map[gridY + 1] && map[gridY + 1][gridX];
-    
     switch (event.key) {
         case "ArrowRight" : // ->          
-            binMoveableX = (objPlayer.playerIntX < objCanvas.width - 115);
+            binMoveRight = true
             objPlayer.playerDirection = 1;
             break;
         case "ArrowLeft" : // <-
-            binMoveableX = objPlayer.playerIntX > 50;
+            binMoveLeft = true;
             objPlayer.playerDirection = -1;
-            
-            console.log("bouge gauche");
             break;
         case "ArrowUp" : // ^
-            if (currentTile === "l" || (tileUnderPlayer === "l" && currentTile === "v" )) {
-                binMoveableY = true;
-                objPlayer.playerDirection = -1;
-            }
+            binMoveUp = true;
+            objPlayer.playerDirection = -1;
             break;
         case "ArrowDown" : // v
-            if ((currentTile === "l" || tileUnderPlayer === "l") && tileUnderPlayer !== "b"){
-                binMoveableY = true;
-                objPlayer.playerDirection = 1;
-            }
+            binMoveDown = true;
+            objPlayer.playerDirection = 1;
             break;
             
     }
 
-    if(tileUnderPlayer === "v"){
-        if(tileUnderPlayer !== "b"){
-            binMoveableX = false;
-            objPlayer.playerDirection = 1;
-            gravity();
-        }
+    if(binMoveRight){
+        objPlayer.playerIntX += objPlayer.playerSpeed;
     }
-
-    if(binMoveableX){
-        erasePlayer();
-        objPlayer.playerIntX += objPlayer.playerSpeed * objPlayer.playerDirection;
-        redessinerMursMap();
-        drawPlayer();
+    if(binMoveLeft){
+        objPlayer.playerIntX -= objPlayer.playerSpeed;
     }
-
-    if(binMoveableY){
-        erasePlayer();
-        objPlayer.playerIntY += objPlayer.playerSpeed * objPlayer.playerDirection ;
-        redessinerMursMap();
-        drawPlayer();
+    if(binMoveUp){
+        objPlayer.playerIntY -= objPlayer.playerSpeed;
     }
-    console.log(objPlayer.playerIntX, objPlayer.playerIntY, gridX, gridY, currentTile);
-    console.log(tileUnderPlayer);
+    if(binMoveDown){
+        objPlayer.playerIntY += objPlayer.playerSpeed;
+    }
 }
 
-function gravity(){
-    erasePlayer();
-    objPlayer.playerIntY += objPlayer.playerSpeed * objPlayer.playerDirection ;
-    redessinerMursMap();
-    drawPlayer();
+//Voir les limites de Runner. Utile pour les tests
+function drawPlayerHitBox() {
+    objC2D.strokeStyle = "red";
+    objC2D.strokeRect(objPlayer.playerIntX, objPlayer.playerIntY, objPlayer.width, objPlayer.height);
 }
 
-function climb(){
+// function binGravity(){
+//     if (tileBelow === "v") {
+//         return true
+//     }
+//     return false
+// }
 
-}
 
-function playerPosOnMap(){
-    const offsetX = 25;
-    const offsetY = 100;
-    const cellHeight = mapHeight / map.length;
-    const cellWidth = mapWidth / map[0].length;
-    // console.log(cellHeight, cellWidth);
+// function movePlayer1() {
+//     let binMoveLeft = false;
+//     let binMoveRight = false;
+//     let binMoveUp = false;
+//     let binMoveDown = false;
+//     let gravitySpeed = 4;
 
-    let gridX = Math.floor((objPlayer.playerIntX - offsetX) / cellWidth);
-    let gridY = Math.floor((objPlayer.playerIntY - offsetY) / cellHeight);
+//     window.addEventListener("keydown", function (event) {
+//         switch (event.key) {
+//             case "ArrowLeft":
+//                 binMoveLeft = true;
+//                 break;
+//             case "ArrowRight":
+//                 binMoveRight = true;
+//                 break;
+//             case "ArrowUp":
+//                 binMoveUp = true;
+//                 break;
+//             case "ArrowDown":
+//                 binMoveDown = true;
+//                 break;
+//         }
+//     });
 
-    return { gridX, gridY };
-}
+//     let cellWidth = mapWidth / map[0].length;
+//     let cellHeight = mapHeight / map.length;
 
-//redessiner les murs et la map car sinon le joueur laisse une trace et
-//si tu redessine tout le canvas, le timer va reset a chaque mouvement 
-function redessinerMursMap() {
-    objC2D.save();
-    objC2D.clearRect(objPlayer.playerIntX, objPlayer.playerIntY, objPlayer.width, objPlayer.height);
-    drawMap(); 
-    //drawWalls(); 
-    objC2D.restore();
-}
+//     let col = Math.floor((objPlayer.playerIntX + objPlayer.width / 2) / cellWidth);
+//     let row = Math.floor((objPlayer.playerIntY + objPlayer.height) / cellHeight);
+
+//     let tileCurrent = map[row][col];
+//     let tileBelow = row + 1 < map.length ? map[row + 1][col] : "b";
+//     let tileAbove = row - 1 >= 0 ? map[row - 1][col] : "b";
+//     let tileLeft = col - 1 >= 0 ? map[row][col - 1] : "b";
+//     let tileRight = col + 1 < map[0].length ? map[row][col + 1] : "b";
+
+//     let speed = objPlayer.playerSpeed;
+    
+//     if (tileBelow === "v") {
+//         objPlayer.playerIntY += gravitySpeed;
+//     }
+
+//     if (binMoveLeft && tileLeft !== "b") objPlayer.playerIntX -= speed;
+//     if (binMoveRight && tileRight !== "b") objPlayer.playerIntX += speed;
+//     if (binMoveUp && (tileCurrent === "l" || tileAbove === "l")) objPlayer.playerIntY -= speed;
+//     if (binMoveDown && tileBelow !== "b") objPlayer.playerIntY += speed;
+// }

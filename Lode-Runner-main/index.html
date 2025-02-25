@@ -46,6 +46,7 @@
         initWalls();
         initMap();
         initPlayer();
+        animate();
         draw();
       }
 
@@ -77,10 +78,6 @@
 
       function eraseDrawing() {
         objC2D.clearRect(0, 0, objCanvas.width, objCanvas.height);
-      }
-      
-      function erasePlayer(){
-        objC2D.clearRect(objPlayer.playerIntX, objPlayer.playerIntY, objPlayer.height,  objPlayer.width);
       }
     </script>
   </head>
