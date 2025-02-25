@@ -1,18 +1,10 @@
-    function initMap(){
-        
-        mapHeight = canvas.height - 400;
-        mapWidth = canvas.width - 100;
+let textures = {};
 
-        // v = void
-        // b = brick
-        // l = ladder
-        // r = rope
-        // p = pavement
-        // g = gold
-        // S = spawn
+function initMap(){
+    mapHeight = canvas.height - 400;
+    mapWidth = canvas.width - 100;
 
-
-        map = [
+    map = [
             ["v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v"],
             ["v","v","v","v","g","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v"],
             ["b","b","b","b","b","b","b","l","b","b","b","b","b","b","b","v","v","v","v","v","v","v","v","v","v","v","v","v"],
@@ -30,144 +22,46 @@
             ["v","v","v","v","l","v","v","v","v","v","v","v","v","v","S","v","v","v","g","v","v","v","v","v","v","v","v","l"],
             ["b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b"],
             ["p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p"]
-        ];
-          
+    ];
+
+    const textureFiles = {
+        "v": "./assets/textures/void.png",
+        "b": "./assets/textures/brick.png",
+        "l": "./assets/textures/ladder.png",
+        "r": "./assets/textures/rope.png",
+        "p": "./assets/textures/pavement.png",
+        "g": "./assets/textures/gold.png",
+        "S": "./assets/textures/void.png"
+    };
+    
+    for (let key in textureFiles) {
+        textures[key] = new Image();
+        textures[key].src = textureFiles[key];
+    }
+    
+    console.log("Textures initialized");
 }
 
 function drawMap(){
     const offsetX = 50;
-    const offsetY = 100; 
-
+    const offsetY = 100;
     objC2D.fillStyle = "black";
     objC2D.fillRect(offsetX, offsetY, objCanvas.width - 100, objCanvas.height - 400);
 
-    const voidTexture = new Image();
-    voidTexture.src = "./assets/textures/void.png";
+    const cellHeight = mapHeight / map.length;
+    const cellWidth = mapWidth / map[0].length;
 
-    voidTexture.onload = () => {
-        console.log("Void texture loaded");
-        let drawVoid = () => {
-            for (let i = 0; i < map.length; i++){
-                for(let j = 0; j < map[i].length; j++){
-                    if(map[i][j] == "v" || map[i][j] == "S"){
-
-                        // if(map[i][j] == "S"){
-                        //     spawnX = j * (mapWidth / map[i].length) + offsetX;
-                        //     spawnY = i * (mapHeight / map.length) + offsetY;
-                        //     console.log(spawnX, spawnY);
-                        // }
-                        
-                        const cellHeight = mapHeight / map.length;
-                        const cellWidth = mapWidth / map[i].length;
-                        objC2D.drawImage(voidTexture, j * cellWidth + offsetX, i * cellHeight + offsetY);
-                    }
-                }
+    for (let i = 0; i < map.length; i++){
+        for(let j = 0; j < map[i].length; j++){
+            let texture = textures[map[i][j]];
+            if (texture && texture.complete) {
+                objC2D.drawImage(texture, j * cellWidth + offsetX, i * cellHeight + offsetY);
             }
         }
-    
-        drawVoid();
     }
-
-    const brickTexture = new Image();
-    brickTexture.src = "./assets/textures/brick.png";
-
-    brickTexture.onload = () => {
-        console.log("Brick texture loaded");
-        let drawBrick = () => {
-            for (let i = 0; i < map.length; i++){
-                for(let j = 0; j < map[i].length; j++){
-                    if(map[i][j] == "b"){
-                        const cellHeight = mapHeight / map.length;
-                        const cellWidth = mapWidth / map[i].length;
-                        objC2D.drawImage(brickTexture, j * cellWidth + offsetX, i * cellHeight + offsetY);
-                    }
-                }
-            }
-        }
-    
-        drawBrick();
-    }
-
-    const ladderTexture = new Image();
-    ladderTexture.src = "./assets/textures/ladder.png";
-
-    ladderTexture.onload = () => {
-        console.log("Ladder texture loaded");
-        let drawLadder = () => {
-            for (let i = 0; i < map.length; i++){
-                for(let j = 0; j < map[i].length; j++){
-                    if(map[i][j] == "l"){
-                        const cellHeight = mapHeight / map.length;
-                        const cellWidth = mapWidth / map[i].length;
-                        objC2D.drawImage(ladderTexture, j * cellWidth + offsetX, i * cellHeight + offsetY);
-                    }
-                }
-            }
-        }
-        
-        drawLadder();
-    }
-
-    const ropeTexture = new Image();
-    ropeTexture.src = "./assets/textures/rope.png";
-
-    ropeTexture.onload = () => {
-        console.log("Rope texture loaded");
-        let drawRope = () => {
-            for (let i = 0; i < map.length; i++){
-                for(let j = 0; j < map[i].length; j++){
-                    if(map[i][j] == "r"){
-                        const cellHeight = mapHeight / map.length;
-                        const cellWidth = mapWidth / map[i].length;
-                        objC2D.drawImage(ropeTexture, j * cellWidth + offsetX, i * cellHeight + offsetY);
-                    }
-                }
-            }
-        }
-    
-        drawRope();
-    }
-
-    const pavementTexture = new Image();
-    pavementTexture.src = "./assets/textures/pavement.png";
-
-    pavementTexture.onload = () => {
-        console.log("Pavement texture loaded");
-        let drawPavement = () => {
-            for (let i = 0; i < map.length; i++){
-                for(let j = 0; j < map[i].length; j++){
-                    if(map[i][j] == "p"){
-                        const cellHeight = mapHeight / map.length;
-                        const cellWidth = mapWidth / map[i].length;
-                        objC2D.drawImage(pavementTexture, j * cellWidth + offsetX, i * cellHeight + offsetY);
-                    }
-                }
-            }
-        }
-    
-        drawPavement();
-    }
-
-    const goldTexture = new Image();
-    goldTexture.src = "./assets/textures/gold.png";
-
-    goldTexture.onload = () => {
-        console.log("Gold texture loaded");
-        let drawGold = () => {
-            for (let i = 0; i < map.length; i++){
-                for(let j = 0; j < map[i].length; j++){
-                    if(map[i][j] == "g"){
-                        const cellHeight = mapHeight / map.length;
-                        const cellWidth = mapWidth / map[i].length;
-                        objC2D.drawImage(goldTexture, j * cellWidth + offsetX, i * cellHeight + offsetY);
-                    }
-                }
-            }
-        }
-        drawGold();
-    }  
-    console.log("Map initialized");
+    console.log("Map drawn");
 }
+
 
 
 function initWalls(){
