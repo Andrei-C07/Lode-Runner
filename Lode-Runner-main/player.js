@@ -148,6 +148,10 @@ function checkGoldPickup() {
             map[gridY][gridX] = "v";
 
             miseAJourScore(250);
+            intGold++;
+            if(intGold % 6 == 0){
+                console.log("next lvl");
+            }
         }
     }
 }
