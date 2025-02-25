@@ -129,13 +129,25 @@ function drawPlayerHitBox() {
 //     if (binMoveUp && (tileCurrent === "l" || tileAbove === "l")) objPlayer.playerIntY -= speed;
 //     if (binMoveDown && tileBelow !== "b") objPlayer.playerIntY += speed;
 // }
+function playerPosOnMap() {
+    const offsetX = 50;
+    const offsetY = 100; 
+    const tileWidth = mapWidth / map[0].length; 
+    const tileHeight = mapHeight / map.length; 
 
-function checkGoldPickup(){
+    let gridX = Math.floor((objPlayer.playerIntX - offsetX) / tileWidth);
+    let gridY = Math.floor((objPlayer.playerIntY - offsetY) / tileHeight);
+
+    return { gridX, gridY };
+}
+function checkGoldPickup() {
     let { gridX, gridY } = playerPosOnMap();
 
-    if (map[gridY] && map[gridY][gridX] === "g") {
+    if (gridY >= 0 && gridY < map.length && gridX >= 0 && gridX < map[gridY].length) {
+        if (map[gridY][gridX] === "g") {
+            map[gridY][gridX] = "v";
 
-        map[gridY][gridX] = "v";
-        miseAJourScore(250);
+            miseAJourScore(250);
+        }
     }
 }
