@@ -49,6 +49,15 @@ function getPlayerBox() {
     };
 }
 
+//retourne la position du joueur sur la carte
+function playerPosOnMap() {
+    const tileWidth = mapWidth / map[0].length;
+    const tileHeight = mapHeight / map.length;
+    let gridX = Math.floor((objPlayer.playerIntX - OFFSET_X) / tileWidth);
+    let gridY = Math.floor((objPlayer.playerIntY - OFFSET_Y) / tileHeight);
+    return { gridX, gridY };
+}
+
 function getTileBox(row, col) {
     const tileWidth = mapWidth / map[0].length;
     const tileHeight = mapHeight / map.length;
@@ -66,19 +75,80 @@ function estTuileSolide(tile) {
     return tile === "b" || tile === "p";
 }
 
-//retourne la boite de collision de la tuile
-function getTileBox(row, col) {
-    const tileWidth = mapWidth / map[0].length;
-    const tileHeight = mapHeight / map.length;
+// -----------------
+// KEY HANDLING & GRAVITY
+// -----------------
+function movePlayer() {
+    let dx = 0;
+    let dy = 0;
 
-    return {
-        left: OFFSET_X + col * tileWidth,
-        right: OFFSET_X + (col + 1) * tileWidth,
-        top: OFFSET_Y + row * tileHeight,
-        bottom: OFFSET_Y + (row + 1) * tileHeight
-    };
+    if (objPlayer.state === "grounded" || objPlayer.fallingTimer < 100) {
+        switch(event.key) {
+            case "ArrowRight":
+                //tryExitLadder("right");
+                dx = objPlayer.playerSpeed;
+                break;
+            case "ArrowLeft":
+                //tryExitLadder("left");
+                dx = -objPlayer.playerSpeed;
+                break;
+            case "ArrowUp":   
+                if (isOnLadder()) 
+                    dy = -objPlayer.playerSpeed;
+                break;
+            case "ArrowDown":
+                dy = objPlayer.playerSpeed;
+                break;
+        }
+    }
+
+    updatePlayerPosition(dx, dy);
+    checkGoldPickup();
+    
 }
 
+//regarde si le joueur est sur une echelle
+//retourne true ou false
+function isOnLadder() {
+    let playerBox = getPlayerBox();
+    const tileWidth = mapWidth / map[0].length;
+    const tileHeight = mapHeight / map.length;
+    
+    let startCol = Math.floor((playerBox.left - OFFSET_X) / tileWidth);
+    let endCol   = Math.floor((playerBox.right - OFFSET_X) / tileWidth);
+    let startRow = Math.floor((playerBox.top - OFFSET_Y) / tileHeight);
+    let endRow   = Math.floor((playerBox.bottom - OFFSET_Y) / tileHeight);
+    
+    startCol = Math.max(0, startCol);
+    endCol = Math.min(map[0].length - 1, endCol);
+    startRow = Math.max(0, startRow);
+    endRow = Math.min(map.length - 1, endRow);
+    
+    for (let row = startRow; row <= endRow; row++) {
+        for (let col = startCol; col <= endCol; col++) {
+            if (map[row][col] === "l") {
+                return true;
+            }
+        }
+    }
+    return false;
+
+    // let { left, right, top, bottom } = getPlayerBox();
+    // const tileWidth = mapWidth / map[0].length;
+    // const tileHeight = mapHeight / map.length;
+
+    // let startCol = Math.max(0, Math.floor((left - OFFSET_X) / tileWidth));
+    // let endCol = Math.min(map[0].length - 1, Math.floor((right - OFFSET_X) / tileWidth));
+    // let startRow = Math.max(0, Math.floor((top - OFFSET_Y) / tileHeight));
+    // let endRow = Math.min(map.length - 1, Math.floor((bottom - OFFSET_Y) / tileHeight));
+
+    // for (let row = startRow; row <= endRow; row++) {
+    //     for (let col = startCol; col <= endCol; col++) {
+    //         if (map[row][col] === "l") return true;
+    //     }
+    // }
+    // return false;
+}
 
 //Check si deux boites de collision s'intersectent
 //logique: retourne false si une de ses conditions est vraie
@@ -186,14 +256,6 @@ function updatePlayerPosition(dx, dy) {
     objPlayer.playerIntY += dy;
     resolveVerticalCollisions();
 }
-//retourne la position du joueur sur la carte
-function playerPosOnMap() {
-    const tileWidth = mapWidth / map[0].length;
-    const tileHeight = mapHeight / map.length;
-    let gridX = Math.floor((objPlayer.playerIntX - OFFSET_X) / tileWidth);
-    let gridY = Math.floor((objPlayer.playerIntY - OFFSET_Y) / tileHeight);
-    return { gridX, gridY };
-}
 
 //retourne la position du joueur en bas au centre sur la carte
 function playerBottomCenterPosOnMap() {
@@ -221,31 +283,26 @@ function checkGoldPickup() {
     }
 }
 
-//regarde si le joueur est sur une echelle
-function isOnLadder() {
-    let playerBox = getPlayerBox();
-    const tileWidth = mapWidth / map[0].length;
-    const tileHeight = mapHeight / map.length;
-    
-    let startCol = Math.floor((playerBox.left - OFFSET_X) / tileWidth);
-    let endCol   = Math.floor((playerBox.right - OFFSET_X) / tileWidth);
-    let startRow = Math.floor((playerBox.top - OFFSET_Y) / tileHeight);
-    let endRow   = Math.floor((playerBox.bottom - OFFSET_Y) / tileHeight);
-    
-    startCol = Math.max(0, startCol);
-    endCol = Math.min(map[0].length - 1, endCol);
-    startRow = Math.max(0, startRow);
-    endRow = Math.min(map.length - 1, endRow);
-    
-    for (let row = startRow; row <= endRow; row++) {
-        for (let col = startCol; col <= endCol; col++) {
-            if (map[row][col] === "l") {
-                return true;
-            }
+//Appliquer gravite si le joueur n'est pas sur une echelle
+function applyGravity() {
+    let bottomPos = playerBottomCenterPosOnMap();
+    const FALLING_DELAY = 100; 
+
+    if (map[bottomPos.gridY][bottomPos.gridX] !== "l" && !estTuileSolide(map[bottomPos.gridY][bottomPos.gridX])) {
+        objPlayer.fallingTimer += 20; 
+
+        if (objPlayer.fallingTimer >= FALLING_DELAY) {
+            objPlayer.state = "falling";
+            updatePlayerPosition(0, 4);
         }
+    } else {
+        objPlayer.fallingTimer = 0;
+        objPlayer.state = "grounded";
     }
-    return false;
 }
+setInterval(applyGravity, 20);
+
+
 
 //regarde si le joueur est sur une echelle et essaie de sortir
 // function tryExitLadder(direction) {
@@ -278,64 +335,3 @@ function isOnLadder() {
 //     }
 // }
 
-// -----------------
-// KEY HANDLING & GRAVITY
-// -----------------
-function movePlayer() {
-    let dx = 0;
-    let dy = 0;
-
-    if (objPlayer.state === "grounded" || objPlayer.fallingTimer < 100) {
-        switch(event.key) {
-            case "ArrowRight":
-                //tryExitLadder("right");
-                dx = objPlayer.playerSpeed;
-                break;
-            case "ArrowLeft":
-                //tryExitLadder("left");
-                dx = -objPlayer.playerSpeed;
-                break;
-            case "ArrowUp":   
-                if (isOnLadder()) {
-                    dy = -objPlayer.playerSpeed;
-                }
-                break;
-            case "ArrowDown":
-                dy = objPlayer.playerSpeed;
-                break;
-        }
-    }
-    if (isOnLadder()) {
-        switch(event.key) {
-            case "ArrowUp":   
-                dy = -objPlayer.playerSpeed;
-                break;
-            case "ArrowDown":
-                dy = objPlayer.playerSpeed;
-                break;
-        }
-    }
-
-    updatePlayerPosition(dx, dy);
-    checkGoldPickup();
-    
-}
-
-//Appliquer gravite si le joueur n'est pas sur une echelle
-function applyGravity() {
-    let bottomPos = playerBottomCenterPosOnMap();
-    const FALLING_DELAY = 100; 
-
-    if (map[bottomPos.gridY][bottomPos.gridX] !== "l" && !estTuileSolide(map[bottomPos.gridY][bottomPos.gridX])) {
-        objPlayer.fallingTimer += 20; 
-
-        if (objPlayer.fallingTimer >= FALLING_DELAY) {
-            objPlayer.state = "falling";
-            updatePlayerPosition(0, 4);
-        }
-    } else {
-        objPlayer.fallingTimer = 0;
-        objPlayer.state = "grounded";
-    }
-}
-setInterval(applyGravity, 20);
