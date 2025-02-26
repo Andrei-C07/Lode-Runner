@@ -20,7 +20,7 @@ function initMap(){
         ["v","v","v","v","v","v","v","v","v","l","v","v","v","v","v","v","v","v","v","v","l","v","v","v","v","v","v","v"],
         ["v","v","v","v","v","v","v","g","v","l","r","r","r","r","r","r","r","r","r","r","l","v","v","v","g","v","v","v"],
         ["v","v","v","v","l","b","b","b","b","b","b","v","v","v","v","v","v","v","v","v","b","b","b","b","b","b","b","l"],
-        ["v","v","v","v","l","v","v","v","v","v","v","v","v","v","S","v","v","v","g","v","v","v","v","v","v","v","v","l"],
+        ["v","v","v","v","l","v","v","v","v","v","v","v","v","v","v","v","v","v","g","v","v","v","v","v","v","v","v","l"],
         ["b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b"],
         ["p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p"]
     ];
@@ -32,7 +32,8 @@ function initMap(){
         "r": "./assets/textures/rope.png",
         "p": "./assets/textures/pavement.png",
         "g": "./assets/textures/gold.png",
-        "S": "./assets/textures/void.png"
+        "S": "./assets/textures/void.png",
+        "h": "./assets/textures/void.png",
     };
     
     for (let key in textureFiles) {

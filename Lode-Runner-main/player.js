@@ -17,9 +17,9 @@ function initPlayer() {
     objPlayer.imgPlayer = objImgPlayer;
     objPlayer.playerIntX = spawnX;
     objPlayer.playerIntY = spawnY;
-    objPlayer.width = 30;
+    objPlayer.width = 64;
     objPlayer.height = 64;
-    objPlayer.playerSpeed = 8;
+    objPlayer.playerSpeed = 16;
     objPlayer.playerDirection = 0;
     objPlayer.state = "grounded";
     objPlayer.fallingTimer = 0;
@@ -55,6 +55,8 @@ function playerPosOnMap() {
     const tileHeight = mapHeight / map.length;
     let gridX = Math.floor((objPlayer.playerIntX - OFFSET_X) / tileWidth);
     let gridY = Math.floor((objPlayer.playerIntY - OFFSET_Y) / tileHeight);
+    console.log(`Player grid position: (${gridX}, ${gridY})`);
+    console.log(`Tile at (${gridX}, ${gridY}): ${map[gridY][gridX]}`);
     return { gridX, gridY };
 }
 
@@ -73,6 +75,58 @@ function getTileBox(row, col) {
 //Determine si la tuile est solide
 function estTuileSolide(tile) {
     return tile === "b" || tile === "p";
+}
+
+let holes = [];
+
+function addHole(row, col) {
+    holes.push({ row, col, timer: 8 * 1000 }); 
+    map[row][col] = "h"; 
+    console.log(`Dug a hole at (${row}, ${col})`);
+}
+
+function updateHoles() {
+    const intervalDuration = 100; 
+    for (let i = holes.length - 1; i >= 0; i--) {
+        holes[i].timer -= intervalDuration;
+        console.log(`Hole at (${holes[i].row}, ${holes[i].col}) has ${holes[i].timer}ms left`);
+        if (holes[i].timer <= 0) {
+            console.log(`Filling hole at (${holes[i].row}, ${holes[i].col})`);
+            map[holes[i].row][holes[i].col] = "b"; 
+            holes.splice(i, 1); 
+        }
+    }
+}
+setInterval(updateHoles, 100);
+
+
+function canDig(row, col) {
+    if (map[row][col] !== "b") {
+        console.log("Pas une bricke.");
+        return false; 
+    }
+    if (row > 0 && map[row - 1][col] !== "v") {
+        return false; 
+    }
+    return true;
+}
+function digHole(direction) {
+    let { gridX, gridY } = playerPosOnMap();
+    let targetCol = direction === 'right' ? gridX + 1 : gridX - 1;
+    let targetRow = gridY + 1; 
+
+    
+    if (targetCol < 0 || targetCol >= map[0].length || targetRow < 0 || targetRow >= map.length) {
+        console.log("Ne peut pas creuser a lexterieure de la map.");
+        return;
+    }
+
+    if (canDig(targetRow, targetCol)) {
+        
+        addHole(targetRow, targetCol);
+    } else {
+        console.log("Ne peut pas creuser ici.");
+    }
 }
 
 // -----------------
@@ -99,13 +153,23 @@ function movePlayer() {
             case "ArrowDown":
                 dy = objPlayer.playerSpeed;
                 break;
+            case "x":
+                digHole("right");
+                break;
+            case "z":
+                digHole("left");
+                break;
+
+            
         }
+
     }
 
     updatePlayerPosition(dx, dy);
     checkGoldPickup();
     
 }
+
 
 //regarde si le joueur est sur une echelle
 //retourne true ou false
@@ -271,6 +335,7 @@ function playerBottomCenterPosOnMap() {
 //regarde si le joueur est sur une piece d'or et la ramasse
 function checkGoldPickup() {
     let { gridX, gridY } = playerPosOnMap();
+    //console.log(gridX, gridY);
     if (gridY >= 0 && gridY < map.length && gridX >= 0 && gridX < map[gridY].length) {
         if (map[gridY][gridX] === "g") {
             map[gridY][gridX] = "v";
@@ -293,7 +358,7 @@ function applyGravity() {
 
         if (objPlayer.fallingTimer >= FALLING_DELAY) {
             objPlayer.state = "falling";
-            updatePlayerPosition(0, 4);
+            updatePlayerPosition(0, 8);
         }
     } else {
         objPlayer.fallingTimer = 0;
@@ -301,6 +366,7 @@ function applyGravity() {
     }
 }
 setInterval(applyGravity, 20);
+
 
 
 
