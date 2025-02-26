@@ -1,12 +1,42 @@
 // Constants pour offset et collisions
 const OFFSET_X = 50;
 const OFFSET_Y = 100;
-const EXIT_TOLERANCE = 50;
-const LADDER_TOP_OFFSET = 20;
+//const EXIT_TOLERANCE = 50;
+//const LADDER_TOP_OFFSET = 20;
 
-//Determine si la tuile est solide
-function estTuileSolide(tile) {
-    return tile === "b" || tile === "p";
+// PLAYER INITIALIZATION & DESSIN
+
+function initPlayer() {
+    objImgPlayer = new Image();
+    objImgPlayer.src = "assets/player/playerIDLE.png";
+    objPlayer = {};
+    objImgPlayer.onload = function() {
+        console.log("Player loaded");
+        draw();
+    };
+    objPlayer.imgPlayer = objImgPlayer;
+    objPlayer.playerIntX = spawnX;
+    objPlayer.playerIntY = spawnY;
+    objPlayer.width = 30;
+    objPlayer.height = 64;
+    objPlayer.playerSpeed = 8;
+    objPlayer.playerDirection = 0;
+    objPlayer.state = "grounded";
+    objPlayer.fallingTimer = 0;
+}
+
+function drawPlayer() {
+    objC2D.save();
+    drawPlayerHitBox();
+    objC2D.drawImage(objPlayer.imgPlayer, objPlayer.playerIntX, objPlayer.playerIntY);
+    objC2D.restore();
+}
+
+// dessiner la boite de collision du joueur.
+//Utile pour faire des tests.
+function drawPlayerHitBox() {
+    objC2D.strokeStyle = "red";
+    objC2D.strokeRect(objPlayer.playerIntX, objPlayer.playerIntY, objPlayer.width, objPlayer.height);
 }
 
 //retourne la boite de collision du joueur
@@ -17,6 +47,23 @@ function getPlayerBox() {
         top: objPlayer.playerIntY,
         bottom: objPlayer.playerIntY + objPlayer.height
     };
+}
+
+function getTileBox(row, col) {
+    const tileWidth = mapWidth / map[0].length;
+    const tileHeight = mapHeight / map.length;
+
+    return {
+        left: OFFSET_X + col * tileWidth,
+        right: OFFSET_X + (col + 1) * tileWidth,
+        top: OFFSET_Y + row * tileHeight,
+        bottom: OFFSET_Y + (row + 1) * tileHeight
+    };
+}
+
+//Determine si la tuile est solide
+function estTuileSolide(tile) {
+    return tile === "b" || tile === "p";
 }
 
 //retourne la boite de collision de la tuile
@@ -199,85 +246,53 @@ function isOnLadder() {
     }
     return false;
 }
+
 //regarde si le joueur est sur une echelle et essaie de sortir
-function tryExitLadder(direction) {
-    // 1) si le joueur n'est pas sur une echelle, on ne fait rien
-    if (!isOnLadder()) return;
+// function tryExitLadder(direction) {
+//     // 1- si le joueur n'est pas sur une echelle, on ne fait rien
+//     if (!isOnLadder()) return;
 
-    // 2) determine si on est sur la derniere echelle
-    let { gridX, gridY } = playerBottomCenterPosOnMap();
-    // si il y a un element L en haut de la tuile actuelle, on ne peut pas sortir
-    if (gridY > 0 && map[gridY - 1][gridX] === "l") {
-        return;
-    }
+//     // 2- determine si on est sur la derniere echelle
+//     let { gridX, gridY } = playerBottomCenterPosOnMap();
+//     // si il y a un element L en haut de la tuile actuelle, on ne peut pas sortir
+//     if (gridY > 0 && map[gridY - 1][gridX] === "l") {
+//         return;
+//     }
 
-    // 3)check horizontallement dans le direction ou le joueur veut aller
-    let nextGridX = direction === "right" ? gridX + 1 : gridX - 1;
-    if (nextGridX < 0 || nextGridX >= map[0].length) return;
+//     // 3- check horizontallement dans la direction ou le joueur veut aller
+//     let nextGridX = direction === "right" ? gridX + 1 : gridX - 1;
+//     if (nextGridX < 0 || nextGridX >= map[0].length) return;    
 
-    // 4) si la tuile a cote est solide, snap les pieds a la tuile
-    if (estTuileSolide(map[gridY][nextGridX])) {
-        let tileBox = getTileBox(gridY, nextGridX);
-        objPlayer.playerIntY = tileBox.top - objPlayer.height;
-    }
-    else {
-        // 5) si la tuile est pas solide, check si la tuile en haut est solide
-        //   si la tuile a (gridY-1, nextGridX) est solide, snap a celle la.
-        if (gridY > 0 && estTuileSolide(map[gridY - 1][nextGridX])) {
-            let tileBox = getTileBox(gridY - 1, nextGridX);
-            objPlayer.playerIntY = tileBox.top - objPlayer.height;
-        }
-    }
-}
-
-// PLAYER INITIALIZATION & DESSIN
-
-function initPlayer() {
-    objImgPlayer = new Image();
-    objImgPlayer.src = "assets/player/playerIDLE.png";
-    objPlayer = {};
-    objImgPlayer.onload = function() {
-        console.log("Player loaded");
-        draw();
-    };
-    objPlayer.imgPlayer = objImgPlayer;
-    objPlayer.playerIntX = spawnX;
-    objPlayer.playerIntY = spawnY;
-    objPlayer.width = 30;
-    objPlayer.height = 64;
-    objPlayer.playerSpeed = 12.4;
-    objPlayer.playerDirection = 0;
-    objPlayer.state = "grounded";
-    objPlayer.fallingTimer = 0;
-}
-
-function drawPlayer() {
-    objC2D.save();
-    drawPlayerHitBox();
-    objC2D.drawImage(objPlayer.imgPlayer, objPlayer.playerIntX, objPlayer.playerIntY);
-    objC2D.restore();
-}
-
-function drawPlayerHitBox() {
-    objC2D.strokeStyle = "red";
-    objC2D.strokeRect(objPlayer.playerIntX, objPlayer.playerIntY, objPlayer.width, objPlayer.height);
-}
+//     // // 4- si la tuile a cote est solide, snap les pieds a la tuile
+//     // if (estTuileSolide(map[gridY][nextGridX])) {
+//     //     let tileBox = getTileBox(gridY, nextGridX);
+//     //     objPlayer.playerIntY = tileBox.top - objPlayer.height;
+//     // }
+//     else {
+//         // 5- si la tuile est pas solide, check si la tuile en haut est solide
+//         //   si la tuile a (gridY-1, nextGridX) est solide, snap a celle la.
+//         if (gridY > 0 && estTuileSolide(map[gridY - 1][nextGridX])) {
+//             let tileBox = getTileBox(gridY - 1, nextGridX);
+//             objPlayer.playerIntY = tileBox.top - objPlayer.height;
+//         }
+//     }
+// }
 
 // -----------------
 // KEY HANDLING & GRAVITY
 // -----------------
-function handleKeyDown(event) {
+function movePlayer() {
     let dx = 0;
     let dy = 0;
 
     if (objPlayer.state === "grounded" || objPlayer.fallingTimer < 100) {
         switch(event.key) {
             case "ArrowRight":
-                tryExitLadder("right");
+                //tryExitLadder("right");
                 dx = objPlayer.playerSpeed;
                 break;
             case "ArrowLeft":
-                tryExitLadder("left");
+                //tryExitLadder("left");
                 dx = -objPlayer.playerSpeed;
                 break;
             case "ArrowUp":   
@@ -303,7 +318,7 @@ function handleKeyDown(event) {
 
     updatePlayerPosition(dx, dy);
     checkGoldPickup();
-    draw();
+    
 }
 
 //Appliquer gravite si le joueur n'est pas sur une echelle
@@ -322,8 +337,5 @@ function applyGravity() {
         objPlayer.fallingTimer = 0;
         objPlayer.state = "grounded";
     }
-    draw();
 }
 setInterval(applyGravity, 20);
-
-document.addEventListener('keydown', handleKeyDown);
