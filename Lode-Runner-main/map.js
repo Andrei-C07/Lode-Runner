@@ -1,27 +1,28 @@
 let textures = {};
 
 function initMap(){
-    mapHeight = canvas.height - 400;
-    mapWidth = canvas.width - 100;
+    // Use objCanvas (set in initAnimation) to determine map dimensions
+    mapHeight = objCanvas.height - 400;
+    mapWidth = objCanvas.width - 100;
 
     map = [
-            ["v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v"],
-            ["v","v","v","v","g","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v"],
-            ["b","b","b","b","b","b","b","l","b","b","b","b","b","b","b","v","v","v","v","v","v","v","v","v","v","v","v","v"],
-            ["v","v","v","v","v","v","v","l","r","r","r","r","r","r","r","r","r","r","v","v","v","v","v","g","v","v","v","v"],
-            ["v","v","v","v","v","v","v","l","v","v","v","v","b","b","l","v","v","v","b","b","b","b","b","b","b","l","b","b"],
-            ["v","v","v","v","v","v","v","l","v","v","v","v","b","b","l","v","v","v","v","v","v","v","v","v","v","l","v","v"],
-            ["v","v","v","v","v","v","v","l","v","v","v","v","b","b","l","v","v","v","v","v","v","v","g","v","v","l","v","v"],
-            ["b","b","l","b","b","b","b","b","v","v","v","v","b","b","b","b","b","b","b","b","l","b","b","b","b","b","b","b"],
-            ["v","v","l","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","l","v","v","v","v","v","v","v"],
-            ["v","v","l","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","l","v","v","v","v","v","v","v"],
-            ["b","b","b","b","b","b","b","b","b","l","b","b","b","b","b","b","b","b","b","b","l","v","v","v","v","v","v","v"],
-            ["v","v","v","v","v","v","v","v","v","l","v","v","v","v","v","v","v","v","v","v","l","v","v","v","v","v","v","v"],
-            ["v","v","v","v","v","v","v","g","v","l","r","r","r","r","r","r","r","r","r","r","l","v","v","v","g","v","v","v"],
-            ["v","v","v","v","l","b","b","b","b","b","b","v","v","v","v","v","v","v","v","v","b","b","b","b","b","b","b","l"],
-            ["v","v","v","v","l","v","v","v","v","v","v","v","v","v","S","v","v","v","g","v","v","v","v","v","v","v","v","l"],
-            ["b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b"],
-            ["p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p"]
+        ["v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v"],
+        ["v","v","v","v","g","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v"],
+        ["b","b","b","b","b","b","b","l","b","b","b","b","b","b","b","v","v","v","v","v","v","v","v","v","v","v","v","v"],
+        ["v","v","v","v","v","v","v","l","r","r","r","r","r","r","r","r","r","r","v","v","v","v","v","g","v","v","v","v"],
+        ["v","v","v","v","v","v","v","l","v","v","v","v","b","b","l","v","v","v","b","b","b","b","b","b","b","l","b","b"],
+        ["v","v","v","v","v","v","v","l","v","v","v","v","b","b","l","v","v","v","v","v","v","v","v","v","v","l","v","v"],
+        ["v","v","v","v","v","v","v","l","v","v","v","v","b","b","l","v","v","v","v","v","v","v","g","v","v","l","v","v"],
+        ["b","b","l","b","b","b","b","b","v","v","v","v","b","b","b","b","b","b","b","b","l","b","b","b","b","b","b","b"],
+        ["v","v","l","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","l","v","v","v","v","v","v","v"],
+        ["v","v","l","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","l","v","v","v","v","v","v","v"],
+        ["b","b","b","b","b","b","b","b","b","l","b","b","b","b","b","b","b","b","b","b","l","v","v","v","v","v","v","v"],
+        ["v","v","v","v","v","v","v","v","v","l","v","v","v","v","v","v","v","v","v","v","l","v","v","v","v","v","v","v"],
+        ["v","v","v","v","v","v","v","g","v","l","r","r","r","r","r","r","r","r","r","r","l","v","v","v","g","v","v","v"],
+        ["v","v","v","v","l","b","b","b","b","b","b","v","v","v","v","v","v","v","v","v","b","b","b","b","b","b","b","l"],
+        ["v","v","v","v","l","v","v","v","v","v","v","v","v","v","S","v","v","v","g","v","v","v","v","v","v","v","v","l"],
+        ["b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b"],
+        ["p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p"]
     ];
 
     const textureFiles = {
@@ -59,42 +60,37 @@ function drawMap() {
             }
         }
     }
-    //console.log("Map drawn");
 }
 
-
-
-
 function initWalls(){
-    tabObjWalls = new Array();
-    var objWall = null;
+    tabObjWalls = [];
+    let objWall = {};
 
-    //Mur de gauche
-    objWall = new Object();
+    // Left wall
     objWall.intXStart = 40;
     objWall.intYStart = 100;
     objWall.intXEnd = 50;
     objWall.intYEnd = objCanvas.height - 300;
     tabObjWalls.push(objWall);
 
-    //Mur de droite
-    objWall = new Object();
+    // Right wall
+    objWall = {};
     objWall.intXStart = objCanvas.width - 50;
     objWall.intYStart = 100;
     objWall.intXEnd = objCanvas.width - 40;
     objWall.intYEnd = objCanvas.height - 300;
     tabObjWalls.push(objWall);
 
-    //Mur du haut
-    objWall = new Object();
+    // Top wall
+    objWall = {};
     objWall.intXStart = 50;
     objWall.intYStart = 100;
     objWall.intXEnd = objCanvas.width - 50;
     objWall.intYEnd = 90;
     tabObjWalls.push(objWall);
 
-    //Mur du bas
-    objWall = new Object();
+    // Bottom wall
+    objWall = {};
     objWall.intXStart = 50;
     objWall.intYStart = objCanvas.height - 300;
     objWall.intXEnd = objCanvas.width - 50;
@@ -103,8 +99,8 @@ function initWalls(){
 }
 
 function drawWalls(){
-    for(var i = 0; i < tabObjWalls.length; i++){
-        var objWall = tabObjWalls[i];
+    for (let i = 0; i < tabObjWalls.length; i++){
+        let objWall = tabObjWalls[i];
         objC2D.fillStyle = "green";
         objC2D.fillRect(objWall.intXStart, objWall.intYStart, objWall.intXEnd - objWall.intXStart, objWall.intYEnd - objWall.intYStart);
     }
