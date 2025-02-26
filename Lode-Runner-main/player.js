@@ -121,12 +121,24 @@ function resolveVerticalCollisions() {
 
 //met a jour la position du joueur en fonction de dx et dy
 function updatePlayerPosition(dx, dy) {
-    objPlayer.playerIntX += dx;
+
+    let newX = objPlayer.playerIntX + dx;
+
+    if (newX < OFFSET_X) {
+        newX = OFFSET_X;
+    }
+
+    const mapRightBoundary = OFFSET_X + mapWidth - objPlayer.width;
+    if (newX > mapRightBoundary) {
+        newX = mapRightBoundary;
+    }
+
+    objPlayer.playerIntX = newX;
     resolveHorizontalCollisions();
+
     objPlayer.playerIntY += dy;
     resolveVerticalCollisions();
 }
-
 //retourne la position du joueur sur la carte
 function playerPosOnMap() {
     const tileWidth = mapWidth / map[0].length;
