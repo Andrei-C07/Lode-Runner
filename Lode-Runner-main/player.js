@@ -17,7 +17,7 @@ function initPlayer() {
     objPlayer.playerIntY = spawnY;
     objPlayer.width = 64;
     objPlayer.height = 64;
-    objPlayer.playerSpeed = 32;
+    objPlayer.playerSpeed = 16;
     objPlayer.playerDirection = 0;
     objPlayer.state = "grounded";
     objPlayer.fallingTimer = 0;
@@ -134,14 +134,14 @@ function movePlayer() {
     let dx = 0;
     let dy = 0;
 
-    if (objPlayer.state === "grounded") {
+    if (objPlayer.state === "grounded" || objPlayer.state === "traversingRope") {
         switch(event.key) {
             case "ArrowRight":
-                //tryExitLadder("right");
+                
                 dx = objPlayer.playerSpeed;
                 break;
             case "ArrowLeft":
-                //tryExitLadder("left");
+                
                 dx = -objPlayer.playerSpeed;
                 break;
             case "ArrowUp":   
@@ -189,6 +189,30 @@ function isOnLadder() {
     for (let row = startRow; row <= endRow; row++) {
         for (let col = startCol; col <= endCol; col++) {
             if (map[row][col] === "l") {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+//check si joueur est sur rope
+function isOnRope() {
+    const playerBox = getPlayerBox();
+    const tileWidth = mapWidth / map[0].length;
+    const tileHeight = mapHeight / map.length;
+
+    const sampleY = playerBox.bottom - 1; 
+    const samplePoints = [
+        { x: playerBox.left + 5, y: sampleY },
+        { x: playerBox.left + playerBox.width / 2, y: sampleY },
+        { x: playerBox.right - 5, y: sampleY }
+    ];
+
+    for (let point of samplePoints) {
+        let gridX = Math.floor((point.x - OFFSET_X) / tileWidth);
+        let gridY = Math.floor((point.y - OFFSET_Y) / tileHeight);
+        if (gridY >= 0 && gridY < map.length && gridX >= 0 && gridX < map[0].length) {
+            if (map[gridY][gridX] === "r") {  // "r" marks a rope tile
                 return true;
             }
         }
@@ -337,6 +361,13 @@ function applyGravity() {
     const tileWidth = mapWidth / map[0].length;
     const tileHeight = mapHeight / map.length;
     
+    if (isOnRope()) {
+        objPlayer.state = "traversingRope";
+        if(event.key === "ArrowDown") {
+            objPlayer.state = "falling";
+        }
+        return;
+    }
     //definir sample points gauch centre et droite du joueur
     const samplePoints = [
         { x: playerBox.left + 1, y: playerBox.bottom },
