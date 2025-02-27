@@ -17,7 +17,7 @@ function initPlayer() {
     objPlayer.playerIntY = spawnY;
     objPlayer.width = 64;
     objPlayer.height = 64;
-    objPlayer.playerSpeed = 16;
+    objPlayer.playerSpeed = 64;
     objPlayer.playerDirection = 0;
     objPlayer.state = "grounded";
     objPlayer.fallingTimer = 0;
@@ -195,6 +195,19 @@ function isOnLadder() {
     }
     return false;
 }
+function addLadder() {
+    
+    let ladderRow = 3;
+    let ladderCol = 18
+    
+    if (map[ladderRow][ladderCol] === "v") {
+        for(let i = 0; i <= 5; i++){
+
+            map[ladderRow - i][ladderCol] = "l"; 
+            console.log("Une échelle est apparue à la position (" + ladderCol + ", " + ladderRow + ")");
+        }
+    } 
+}
 //check si joueur est sur rope
 // function isOnRope() {
 //     const playerBox = getPlayerBox();
@@ -235,7 +248,7 @@ function isOnRope() {
         let gridY = Math.floor((point.y - OFFSET_Y) / tileHeight);
         if (gridY >= 0 && gridY < map.length && gridX >= 0 && gridX < map[0].length) {
             if (map[gridY][gridX] === "r") {  
-                console.log(objPlayer.height);
+               // console.log(objPlayer.height);
                 let ropeTileBox = getTileBox(gridY, gridX);
             
                 let desiredBottom = ropeTileBox.top + tileHeight / 1;
@@ -378,11 +391,46 @@ function checkGoldPickup() {
             intGold++;
             if (intGold % 6 === 0) {
                 console.log("Next level!");
+                for(i = 0; i <= 5; i++){
+                    addLadder();
+                  }
             }
         }
     }
 }
+function nextLevel() {
+    console.log("Transitioning to the next level!");
+    strLvl++;
+    resetTimer(); //***FIX TIMER ISSUE, WHEN GOING TO NEXT LEVEL***
+    map = [
+        ["v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v"],
+        ["v","v","v","v","g","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v"],
+        ["b","b","b","b","b","b","b","l","b","b","b","b","b","b","b","v","v","v","v","v","v","v","v","v","v","v","v","v"],
+        ["v","v","v","v","v","v","v","l","r","r","r","r","r","r","r","r","r","r","v","v","v","v","v","g","v","v","v","v"],
+        ["v","v","v","v","v","v","v","l","v","v","v","v","b","b","l","v","v","v","b","b","b","b","b","b","b","l","b","b"],
+        ["v","v","v","v","v","v","v","l","v","v","v","v","b","b","l","v","v","v","v","v","v","v","v","v","v","l","v","v"],
+        ["v","v","v","v","v","v","v","l","v","v","v","v","b","b","l","v","v","v","v","v","v","v","g","v","v","l","v","v"],
+        ["b","b","l","b","b","b","b","b","v","v","v","v","b","b","b","b","b","b","b","b","l","b","b","b","b","b","b","b"],
+        ["v","v","l","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","l","v","v","v","v","v","v","v"],
+        ["v","v","l","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","l","v","v","v","v","v","v","v"],
+        ["b","b","b","b","b","b","b","b","b","l","b","b","b","b","b","b","b","b","b","b","l","v","v","v","v","v","v","v"],
+        ["v","v","v","v","v","v","v","v","v","l","v","v","v","v","v","v","v","v","v","v","l","v","v","v","v","v","v","v"],
+        ["v","v","v","v","v","v","v","g","v","l","r","r","r","r","r","r","r","r","r","r","l","v","v","v","g","v","v","v"],
+        ["v","v","v","v","l","b","b","b","b","b","b","v","v","v","v","v","v","v","v","v","b","b","b","b","b","b","b","l"],
+        ["v","v","v","v","l","v","v","v","v","v","v","v","v","v","v","v","v","v","g","v","v","v","v","v","v","v","v","l"],
+        ["b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b"],
+        ["p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p"]
+    ];
+    objPlayer.playerIntX = spawnX;
+    objPlayer.playerIntY = spawnY;
+}
 
+function checkLevelTransition() {
+
+    if (isOnLadder() && objPlayer.playerIntY < OFFSET_Y) {
+        nextLevel();
+    }
+}
 //Appliquer gravite si le joueur n'est pas sur une echelle
 //
 function applyGravity() {
@@ -421,6 +469,7 @@ function applyGravity() {
     } else {
         objPlayer.state = "grounded";
     }
+    checkLevelTransition();
 }
 setInterval(applyGravity, 20);
 
