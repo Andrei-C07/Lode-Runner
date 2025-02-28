@@ -53,7 +53,6 @@ function playerPosOnMap() {
     const tileHeight = mapHeight / map.length;
     let gridX = Math.floor((objPlayer.playerIntX - OFFSET_X) / tileWidth);
     let gridY = Math.floor((objPlayer.playerIntY - OFFSET_Y) / tileHeight);
-    console.log(`Player grid position: (${gridX}, ${gridY})`);
     console.log(`Tile at (${gridX}, ${gridY}): ${map[gridY][gridX]}`);
     return { gridX, gridY };
 }
@@ -74,29 +73,6 @@ function getTileBox(row, col) {
 function estTuileSolide(tile) {
     return tile === "b" || tile === "p";
 }
-
-let holes = [];
-
-function addHole(row, col) {
-    holes.push({ row, col, timer: 8 * 1000 }); 
-    map[row][col] = "h"; 
-    console.log(`Dug a hole at (${row}, ${col})`);
-}
-
-function updateHoles() {
-    const intervalDuration = 100; 
-    for (let i = holes.length - 1; i >= 0; i--) {
-        holes[i].timer -= intervalDuration;
-        console.log(`Hole at (${holes[i].row}, ${holes[i].col}) has ${holes[i].timer}ms left`);
-        if (holes[i].timer <= 0) {
-            console.log(`Filling hole at (${holes[i].row}, ${holes[i].col})`);
-            map[holes[i].row][holes[i].col] = "b"; 
-            holes.splice(i, 1); 
-        }
-    }
-}
-setInterval(updateHoles, 100);
-
 
 function canDig(row, col) {
     if (map[row][col] !== "b") {
@@ -127,8 +103,49 @@ function digHole(direction) {
     }
 }
 
+let holes = [];
+
+function addHole(row, col) {
+    holes.push({ row, col, timer: 8 * 1000 }); 
+    map[row][col] = "h"; 
+    console.log(`Dug a hole at (${row}, ${col})`);
+}
+
+function updateHoles() {
+    const intervalDuration = 100; 
+    for (let i = holes.length - 1; i >= 0; i--) {
+        holes[i].timer -= intervalDuration;
+        console.log(`Hole at (${holes[i].row}, ${holes[i].col}) has ${holes[i].timer}ms left`);
+        if (holes[i].timer <= 0) {
+            console.log(`Filling hole at (${holes[i].row}, ${holes[i].col})`);
+            map[holes[i].row][holes[i].col] = "b"; 
+            holes.splice(i, 1); 
+        }
+    }
+    dieInHole();
+}
+setInterval(updateHoles, 100);
+
+function dieInHole() {
+    
+    if(isInBrick()){
+        strLives --;
+        objPlayer.state == "dead";
+
+        //Maybe dans une fonction differente :
+
+        //quand le joueur meurt, il doit flotter vers le haut jsuqua ce que sa position soit plus
+        //petite que le offset Y. Meme logique pour changer de niveau
+
+        // ensuite mettre sa position a spawnX et spawnY
+    }
+}
+
+
+
+
 // -----------------
-// KEY HANDLING & GRAVITY
+// KEY HANDLING 
 // -----------------
 function movePlayer() {
     let dx = 0;
@@ -168,6 +185,15 @@ function movePlayer() {
     
 }
 
+function isInBrick(){
+    let {gridX, gridY} = playerPosOnMap();
+    console.log(`Tile at (${gridX}, ${gridY}): ${map[gridY][gridX]}`);
+    if (map[gridY][gridX] === "b")
+        return true;
+    else 
+        return false;
+}
+
 
 //regarde si le joueur est sur une echelle
 //retourne true ou false
@@ -195,30 +221,8 @@ function isOnLadder() {
     }
     return false;
 }
-//check si joueur est sur rope
-// function isOnRope() {
-//     const playerBox = getPlayerBox();
-//     const tileWidth = mapWidth / map[0].length;
-//     const tileHeight = mapHeight / map.length;
 
-//     const sampleY = playerBox.bottom - 1; 
-//     const samplePoints = [
-//         { x: playerBox.left + 5, y: sampleY },
-//         { x: playerBox.left + playerBox.width / 2, y: sampleY },
-//         { x: playerBox.right - 5, y: sampleY }
-//     ];
 
-//     for (let point of samplePoints) {
-//         let gridX = Math.floor((point.x - OFFSET_X) / tileWidth);
-//         let gridY = Math.floor((point.y - OFFSET_Y) / tileHeight);
-//         if (gridY >= 0 && gridY < map.length && gridX >= 0 && gridX < map[0].length) {
-//             if (map[gridY][gridX] === "r") {  // "r" marque une tuile de rope
-//                 return true;
-//             }
-//         }
-//     }
-//     return false;
-// }
 function isOnRope() {
     const playerBox = getPlayerBox();
     const tileWidth = mapWidth / map[0].length;
@@ -235,7 +239,6 @@ function isOnRope() {
         let gridY = Math.floor((point.y - OFFSET_Y) / tileHeight);
         if (gridY >= 0 && gridY < map.length && gridX >= 0 && gridX < map[0].length) {
             if (map[gridY][gridX] === "r") {  
-                console.log(objPlayer.height);
                 let ropeTileBox = getTileBox(gridY, gridX);
             
                 let desiredBottom = ropeTileBox.top + tileHeight / 1;
@@ -249,6 +252,8 @@ function isOnRope() {
     }
     return false;
 }
+
+
 //Check si deux boites de collision s'intersectent
 //logique: retourne false si une de ses conditions est vraie
 // Si le cote droit de r1 est a gauche du cote gauche de r2
@@ -382,45 +387,3 @@ function checkGoldPickup() {
         }
     }
 }
-
-//Appliquer gravite si le joueur n'est pas sur une echelle
-//
-function applyGravity() {
-    const playerBox = getPlayerBox();
-    const tileWidth = mapWidth / map[0].length;
-    const tileHeight = mapHeight / map.length;
-    
-    if (isOnRope()) {
-        objPlayer.state = "traversingRope";
-        return;
-    }
-    //definir sample points gauch centre et droite du joueur
-    const samplePoints = [
-        { x: playerBox.left + 1, y: playerBox.bottom },
-        { x: playerBox.left + playerBox.width / 2, y: playerBox.bottom },
-        { x: playerBox.right - 1, y: playerBox.bottom }
-    ];
-    
-    let grounded = false;
-    
-    for (let point of samplePoints) {
-        let gridX = Math.floor((point.x - OFFSET_X) / tileWidth);
-        let gridY = Math.floor((point.y - OFFSET_Y) / tileHeight);
-        
-        if (gridY >= 0 && gridY < map.length && gridX >= 0 && gridX < map[0].length) {
-            if (map[gridY][gridX] === "l" || estTuileSolide(map[gridY][gridX])) {
-                grounded = true;
-                break;
-            }
-        }
-    }
-    
-    if (!grounded) {
-        updatePlayerPosition(0, 8);
-        objPlayer.state = "falling";
-    } else {
-        objPlayer.state = "grounded";
-    }
-}
-setInterval(applyGravity, 20);
-

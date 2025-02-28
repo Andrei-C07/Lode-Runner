@@ -62,3 +62,45 @@ function drawMap() {
         }
     }
 }
+
+
+//Appliquer gravite si le joueur n'est pas sur une echelle
+//
+function applyGravity() {
+    const playerBox = getPlayerBox();
+    const tileWidth = mapWidth / map[0].length;
+    const tileHeight = mapHeight / map.length;
+    
+    if (isOnRope()) {
+        objPlayer.state = "traversingRope";
+        return;
+    }
+    //definir sample points gauch centre et droite du joueur
+    const samplePoints = [
+        { x: playerBox.left + 1, y: playerBox.bottom },
+        { x: playerBox.left + playerBox.width / 2, y: playerBox.bottom },
+        { x: playerBox.right - 1, y: playerBox.bottom }
+    ];
+    
+    let grounded = false;
+    
+    for (let point of samplePoints) {
+        let gridX = Math.floor((point.x - OFFSET_X) / tileWidth);
+        let gridY = Math.floor((point.y - OFFSET_Y) / tileHeight);
+        
+        if (gridY >= 0 && gridY < map.length && gridX >= 0 && gridX < map[0].length) {
+            if (map[gridY][gridX] === "l" || estTuileSolide(map[gridY][gridX])) {
+                grounded = true;
+                break;
+            }
+        }
+    }
+    
+    if (!grounded) {
+        updatePlayerPosition(0, 8);
+        objPlayer.state = "falling";
+    } else {
+        objPlayer.state = "grounded";
+    }
+}
+setInterval(applyGravity, 20);
