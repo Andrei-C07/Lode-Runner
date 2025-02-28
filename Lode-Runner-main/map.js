@@ -102,5 +102,6 @@ function applyGravity() {
     } else {
         objPlayer.state = "grounded";
     }
+    checkLevelTransition();
 }
 setInterval(applyGravity, 20);
