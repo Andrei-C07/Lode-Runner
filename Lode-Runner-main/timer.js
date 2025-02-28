@@ -3,7 +3,10 @@ let timerInterval;
 
 function resetTimer() {
   timer = "00:00";
+  strTime = timer;
   clearInterval(timerInterval);
+  timeEnMarche = false;
+  updateUITimer();
 }
 
 function startTimer() {

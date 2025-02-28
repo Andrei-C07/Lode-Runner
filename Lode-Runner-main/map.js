@@ -70,7 +70,7 @@ function applyGravity() {
     const playerBox = getPlayerBox();
     const tileWidth = mapWidth / map[0].length;
     const tileHeight = mapHeight / map.length;
-    
+    if (objPlayer.state === "dead") return;
     if (isOnRope()) {
         objPlayer.state = "traversingRope";
         return;

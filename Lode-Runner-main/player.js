@@ -126,11 +126,16 @@ function updateHoles() {
 }
 setInterval(updateHoles, 100);
 
+/**
+ * Fonction qui tue le joueur s'il tombe dans un trou
+ * Explication : il fallait disable collisions + gravity quand le joueur est mort
+ * et le + 70 dans la deuxieme condition est pour qu'on ne le voit pas floter a lexterieur de la map.
+ */
 function dieInHole() {
     
-    if(isInBrick()){
-        strLives --;
-        objPlayer.state == "dead";
+    if(isInBrick() && objPlayer.state !== "dead"){
+
+        objPlayer.state = "dead";
 
         //Maybe dans une fonction differente :
 
@@ -138,6 +143,18 @@ function dieInHole() {
         //petite que le offset Y. Meme logique pour changer de niveau
 
         // ensuite mettre sa position a spawnX et spawnY
+        let floatingSpeed = 5;
+        let floatInterval = setInterval(() => {
+            if (objPlayer.playerIntY + objPlayer.height > OFFSET_Y + 70) {
+                objPlayer.playerIntY -= floatingSpeed;
+            } else {
+                clearInterval(floatInterval);
+                objPlayer.playerIntX = spawnX;
+                objPlayer.playerIntY = spawnY;
+                objPlayer.state = "grounded";
+                strLives --;
+            }
+        }, 30);
     }
 }
 
@@ -187,7 +204,8 @@ function movePlayer() {
 
 function isInBrick(){
     let {gridX, gridY} = playerPosOnMap();
-    console.log(`Tile at (${gridX}, ${gridY}): ${map[gridY][gridX]}`);
+    if (objPlayer.state === "dead") return false;
+    //console.log(`Tile at (${gridX}, ${gridY}): ${map[gridY][gridX]}`);
     if (map[gridY][gridX] === "b")
         return true;
     else 
@@ -235,12 +253,6 @@ function addLadder() {
     } 
 }
 //check si joueur est sur rope
-// function isOnRope() {
-//     const playerBox = getPlayerBox();
-//     const tileWidth = mapWidth / map[0].length;
-//     const tileHeight = mapHeight / map.length;
-
-
 function isOnRope() {
     const playerBox = getPlayerBox();
     const tileWidth = mapWidth / map[0].length;
@@ -362,6 +374,8 @@ function resolveVerticalCollisions() {
 //met a jour la position du joueur en fonction de dx et dy
 function updatePlayerPosition(dx, dy) {
 
+    if(objPlayer.state === "dead") return; //skip collision detection si joueur est mort
+
     let newX = objPlayer.playerIntX + dx;
 
     if (newX < OFFSET_X) {
@@ -413,7 +427,7 @@ function checkGoldPickup() {
 function nextLevel() {
     console.log("Transitioning to the next level!");
     strLvl++;
-    resetTimer(); //***FIX TIMER ISSUE, WHEN GOING TO NEXT LEVEL***
+    resetTimer(); 
     map = [
         ["v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v"],
         ["v","v","v","v","g","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v","v"],
