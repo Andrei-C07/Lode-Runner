@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lode Runner</title>
+    <title>Lode Runner - Andrei Cretu & Alexandru Ciuca</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
       rel="stylesheet"
@@ -11,7 +11,8 @@
     <script src="map.js"></script>
     <script src="ui.js"></script>
     <script src="player.js"></script>
-    <script src="timer.js"> </script>
+    <script src="timer.js"></script>
+    <script src="guards.js"></script>
     <script>
       var objCanvas = null;
       var objC2D = null;
@@ -30,6 +31,10 @@
       var objImgPlayer = null;
       var objPlayer = null;
 
+      var objImgGuard = null;
+      var objGuard = null;
+      var numGuard = null;
+
       var strMembers = null;
       var strTitle = null;
       var strScore = null;
@@ -43,10 +48,10 @@
         objCanvas.focus();
         objC2D = objCanvas.getContext("2d");
 
-        
         initUI();
         initMap();
         initPlayer();
+        initGuard();
         animate();
         draw();
       }
@@ -57,7 +62,7 @@
         drawDynamicUI();
         drawMap();
         drawPlayer();
-        
+        drawGuard();
       }
 
       function animate(){
@@ -69,6 +74,7 @@
       }
 
       function updateAnimation(){
+        updateGuards();
       }
 
       function stopAnimation() {

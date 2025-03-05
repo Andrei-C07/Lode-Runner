@@ -32,7 +32,6 @@ function initMap(){
         "r": "./assets/textures/rope.png",
         "p": "./assets/textures/pavement.png",
         "g": "./assets/textures/gold.png",
-        "S": "./assets/textures/void.png",
         "h": "./assets/textures/void.png",
     };
     
@@ -70,9 +69,9 @@ function applyGravity() {
     const playerBox = getPlayerBox();
     const tileWidth = mapWidth / map[0].length;
     const tileHeight = mapHeight / map.length;
-    if (objPlayer.state === "dead") return;
+    if (objPlayer.playerState === "dead") return;
     if (isOnRope()) {
-        objPlayer.state = "traversingRope";
+        objPlayer.playerState = "traversingRope";
         return;
     }
     //definir sample points gauch centre et droite du joueur
@@ -98,9 +97,9 @@ function applyGravity() {
     
     if (!grounded) {
         updatePlayerPosition(0, 8);
-        objPlayer.state = "falling";
+        objPlayer.playerState = "falling";
     } else {
-        objPlayer.state = "grounded";
+        objPlayer.playerState = "grounded";
     }
     checkLevelTransition();
 }

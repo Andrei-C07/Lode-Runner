@@ -7,19 +7,15 @@ const OFFSET_Y = 100;
 function initPlayer() {
     objImgPlayer = new Image();
     objImgPlayer.src = "assets/player/playerIDLE.png";
-    objPlayer = {};
-    objImgPlayer.onload = function() {
-        console.log("Player loaded");
-        draw();
-    };
+    objPlayer = new Object();
     objPlayer.imgPlayer = objImgPlayer;
     objPlayer.playerIntX = spawnX;
     objPlayer.playerIntY = spawnY;
     objPlayer.width = 64;
     objPlayer.height = 64;
-    objPlayer.playerSpeed = 64;
+    objPlayer.playerSpeed = 16;
     objPlayer.playerDirection = 0;
-    objPlayer.state = "grounded";
+    objPlayer.playerState = "grounded";
     objPlayer.fallingTimer = 0;
 }
 
@@ -84,6 +80,7 @@ function canDig(row, col) {
     }
     return true;
 }
+
 function digHole(direction) {
     let { gridX, gridY } = playerPosOnMap();
     let targetCol = direction === 'right' ? gridX + 1 : gridX - 1;
@@ -133,9 +130,9 @@ setInterval(updateHoles, 100);
  */
 function dieInHole() {
     
-    if(isInBrick() && objPlayer.state !== "dead"){
+    if(isInBrick() && objPlayer.playerState !== "dead"){
 
-        objPlayer.state = "dead";
+        objPlayer.playerState = "dead";
 
         //Maybe dans une fonction differente :
 
@@ -145,13 +142,13 @@ function dieInHole() {
         // ensuite mettre sa position a spawnX et spawnY
         let floatingSpeed = 5;
         let floatInterval = setInterval(() => {
-            if (objPlayer.playerIntY + objPlayer.height > OFFSET_Y + 70) {
+            if (objPlayer.playerIntY + objPlayer.height > OFFSET_Y) {
                 objPlayer.playerIntY -= floatingSpeed;
             } else {
                 clearInterval(floatInterval);
                 objPlayer.playerIntX = spawnX;
                 objPlayer.playerIntY = spawnY;
-                objPlayer.state = "grounded";
+                objPlayer.playerState = "grounded";
                 strLives --;
             }
         }, 30);
@@ -168,7 +165,7 @@ function movePlayer() {
     let dx = 0;
     let dy = 0;
 
-    if (objPlayer.state === "grounded" || objPlayer.state === "traversingRope") {
+    if (objPlayer.playerState === "grounded" || objPlayer.playerState === "traversingRope") {
         switch(event.key) {
             case "ArrowRight":
                 
@@ -204,7 +201,7 @@ function movePlayer() {
 
 function isInBrick(){
     let {gridX, gridY} = playerPosOnMap();
-    if (objPlayer.state === "dead") return false;
+    if (objPlayer.playerState === "dead") return false;
     //console.log(`Tile at (${gridX}, ${gridY}): ${map[gridY][gridX]}`);
     if (map[gridY][gridX] === "b")
         return true;
@@ -276,7 +273,7 @@ function isOnRope() {
                 let dy = desiredBottom - playerBox.bottom;
                 objPlayer.playerIntY += dy;
                
-                objPlayer.state = "traversingRope";
+                objPlayer.playerState = "traversingRope";
                 return true;
             }
         }
@@ -374,7 +371,7 @@ function resolveVerticalCollisions() {
 //met a jour la position du joueur en fonction de dx et dy
 function updatePlayerPosition(dx, dy) {
 
-    if(objPlayer.state === "dead") return; //skip collision detection si joueur est mort
+    if(objPlayer.playerState === "dead") return; //skip collision detection si joueur est mort
 
     let newX = objPlayer.playerIntX + dx;
 

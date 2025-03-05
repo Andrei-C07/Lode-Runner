@@ -1,0 +1,15 @@
+In player.js :
+- fix rope snapping
+- make animation for runnning, climbing, rope, falling
+
+In guard.js :
+- base code
+- same as in player.js
+
+General :
+- sound
+- climb only when in center of ladder
+- redo UI.js
+- get rid of tiemr.js. (merge into UI.js)
+- fix gravity. Too focused on only the player.
+- game over
