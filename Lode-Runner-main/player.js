@@ -9,8 +9,21 @@ function initPlayer() {
     objImgPlayer.src = "assets/player/playerIDLE.png";
     objPlayer = new Object();
     objPlayer.imgPlayer = objImgPlayer;
-    objPlayer.playerIntX = spawnX;
-    objPlayer.playerIntY = spawnY;
+    const tileSize = 64;
+
+    //initialiser le spawn du joueur
+    for (let i = 0; i < map.length; i++) {
+        for (let j = 0; j < map[i].length; j++) {
+            if (map[i][j] === "PS") {
+                PspawnX = j * tileSize + OFFSET_X;
+                PspawnY = i * tileSize + OFFSET_Y;
+                break;
+            }
+        }
+    }
+    
+    objPlayer.playerIntX = PspawnX;
+    objPlayer.playerIntY = PspawnY;
     objPlayer.width = 64;
     objPlayer.height = 64;
     objPlayer.playerSpeed = 16;
@@ -49,7 +62,7 @@ function playerPosOnMap() {
     const tileHeight = mapHeight / map.length;
     let gridX = Math.floor((objPlayer.playerIntX - OFFSET_X) / tileWidth);
     let gridY = Math.floor((objPlayer.playerIntY - OFFSET_Y) / tileHeight);
-    console.log(`Tile at (${gridX}, ${gridY}): ${map[gridY][gridX]}`);
+    //console.log(`Tile at (${gridX}, ${gridY}): ${map[gridY][gridX]}`);
     return { gridX, gridY };
 }
 
@@ -72,7 +85,7 @@ function estTuileSolide(tile) {
 
 function canDig(row, col) {
     if (map[row][col] !== "b") {
-        console.log("Pas une bricke.");
+        //console.log("Pas une bricke.");
         return false; 
     }
     if (row > 0 && map[row - 1][col] !== "v") {
@@ -88,7 +101,7 @@ function digHole(direction) {
 
     
     if (targetCol < 0 || targetCol >= map[0].length || targetRow < 0 || targetRow >= map.length) {
-        console.log("Ne peut pas creuser a lexterieure de la map.");
+        //console.log("Ne peut pas creuser a lexterieure de la map.");
         return;
     }
 
@@ -96,7 +109,7 @@ function digHole(direction) {
         
         addHole(targetRow, targetCol);
     } else {
-        console.log("Ne peut pas creuser ici.");
+       //console.log("Ne peut pas creuser ici.");
     }
 }
 
@@ -105,16 +118,16 @@ let holes = [];
 function addHole(row, col) {
     holes.push({ row, col, timer: 8 * 1000 }); 
     map[row][col] = "h"; 
-    console.log(`Dug a hole at (${row}, ${col})`);
+    //console.log(`Dug a hole at (${row}, ${col})`);
 }
 
 function updateHoles() {
     const intervalDuration = 100; 
     for (let i = holes.length - 1; i >= 0; i--) {
         holes[i].timer -= intervalDuration;
-        console.log(`Hole at (${holes[i].row}, ${holes[i].col}) has ${holes[i].timer}ms left`);
+        //console.log(`Hole at (${holes[i].row}, ${holes[i].col}) has ${holes[i].timer}ms left`);
         if (holes[i].timer <= 0) {
-            console.log(`Filling hole at (${holes[i].row}, ${holes[i].col})`);
+            //console.log(`Filling hole at (${holes[i].row}, ${holes[i].col})`);
             map[holes[i].row][holes[i].col] = "b"; 
             holes.splice(i, 1); 
         }
@@ -245,7 +258,7 @@ function addLadder() {
         for(let i = 0; i <= 5; i++){
 
             map[ladderRow - i][ladderCol] = "l"; 
-            console.log("Une échelle est apparue à la position (" + ladderCol + ", " + ladderRow + ")");
+            //.log("Une échelle est apparue à la position (" + ladderCol + ", " + ladderRow + ")");
         }
     } 
 }
@@ -412,7 +425,7 @@ function checkGoldPickup() {
             miseAJourScore(250);
             intGold++;
             if (intGold % 6 === 0) {
-                console.log("Next level!");
+                //console.log("Next level!");
                 for(i = 0; i <= 5; i++){
                     addLadder();
                   }
@@ -422,7 +435,7 @@ function checkGoldPickup() {
 }
 
 function nextLevel() {
-    console.log("Transitioning to the next level!");
+   // console.log("Transitioning to the next level!");
     strLvl++;
     resetTimer(); 
     map = [
@@ -452,6 +465,7 @@ function checkLevelTransition() {
 
     if (isOnLadder() && objPlayer.playerIntY < OFFSET_Y) {
         nextLevel();
+        miseAJourScore(1500);
     }
 }
 

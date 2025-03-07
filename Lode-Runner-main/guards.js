@@ -1,34 +1,124 @@
-//initialisation et dessin des gardes
-
-function initGuard(){
-    objImgGuard = new Image();
-    objImgGuard.src = "assets/guards/guardIDLE.png";
-    objGuard = new Object();
-    objGuard.imgGuard = objImgGuard;
-    objGuard.guardintX = spawnX + 300;
-    objGuard.guardintY = spawnY;
-    objGuard.width = 64;
-    objGuard.height = 64;
-    objGuard.guardSpeed = 12;
-    objGuard.guardDirection = 0;
-    objGuard.guardState = "grounded";
-    objGuard.fallingTimer = 0;
+class Guard {
+    constructor(x, y, img) {
+        this.imgGuard = img;
+        this.guardintX = x;
+        this.guardintY = y;
+        this.width = 64;
+        this.height = 64;
+        this.guardSpeed = 1.5;
+        this.guardDirection = 0;
+        this.guardState = "freeze";
+        this.fallingTimer = 0;
+    }
 }
 
-function drawGuard(){
+// Initialisation des gardes
+let lstGuards;
+
+function initGuard() {
+    objImgGuard = new Image();
+    objImgGuard.src = "assets/guards/guardIDLE.png";
+
+    lstGuards = [];
+
+    //trouver des spawns pour les gardes
+    //exclure la passerelle sur laquelle se trouve le joueur
+    let playerLevel = Math.floor((objPlayer.playerIntY - OFFSET_Y) / 64);
+    let guardSpawnPoints = [];
+
+    for (let i = 0; i < map.length; i++) {
+        if (i === playerLevel) continue; 
+        for (let j = 0; j < map[i].length; j++) {
+            if (map[i][j] === "v" && map[i  + 1][j] === "b") { 
+                guardSpawnPoints.push({ x: j, y: i });
+            }
+        }
+    }
+
+    for (let i = 0; i < numGuards; i++) {
+
+        let randomIndex = Math.floor(Math.random() * guardSpawnPoints.length);
+        let { x, y } = guardSpawnPoints[randomIndex];
+
+        let GspawnX = x * 64 + OFFSET_X;
+        let GspawnY = y * 64 + OFFSET_Y;
+
+        lstGuards.push(new Guard(GspawnX, GspawnY, objImgGuard));
+        guardSpawnPoints.splice(randomIndex, 1);
+    }
+}
+
+
+// Dessin des gardes
+function drawGuard() {
     objC2D.save();
-    drawGuardHitBox();
-    objC2D.drawImage(objGuard.imgGuard, objGuard.guardintX, objGuard.guardintY);
+    lstGuards.forEach(guard => {
+        drawGuardHitBox(guard);
+        objC2D.drawImage(guard.imgGuard, guard.guardintX, guard.guardintY);
+    });
     objC2D.restore();
 }
 
-// dessiner la boite de collision des gardes.
-//Utile pour faire des tests.
-function drawGuardHitBox() {
+// Dessiner la boîte de collision des gardes
+function drawGuardHitBox(guard) {
     objC2D.strokeStyle = "red";
-    objC2D.strokeRect(objGuard.guardintX, objGuard.guardintY, objGuard.width, objGuard.height);
+    objC2D.strokeRect(guard.guardintX, guard.guardintY, guard.width, guard.height);
 }
 
-function updateGuards(){
-
+function getGuardBox(){
+    return {
+        left: guard.guardintX,
+        right: guard.guardintX + guard.width,
+        top: guard.guardintY,
+        bottom: guard.guardintY + guard.height
+    };
 }
+
+// function guardPosOnMap() {
+//     const tileWidth = mapWidth / map[0].length;
+//     const tileHeight = mapHeight / map.length;
+//     let gridX = Math.floor((guard.guardintX - OFFSET_X) / tileWidth);
+//     let gridY = Math.floor((guard.guardintY - OFFSET_Y) / tileHeight);
+//     console.log(`Tile at (${gridX}, ${gridY}): ${map[gridY][gridX]}`);
+//     return { gridX, gridY };
+// }
+
+function updateGuards() {
+    lstGuards.forEach(guard => {
+        if (guard.guardState !== "freeze") {
+            // Convert guard position to grid coordinates
+            const tileWidth = mapWidth / map[0].length;
+            const tileHeight = mapHeight / map.length;
+            let gridX = Math.floor((guard.guardintX - OFFSET_X) / tileWidth);
+            let gridY = Math.floor((guard.guardintY - OFFSET_Y) / tileHeight);
+
+            let tileBelow = map[gridY + 1] ? map[gridY + 1][gridX] : null;
+            let isOnSolidGround = tileBelow === "b" || tileBelow === "p" || tileBelow === "l";
+
+            if (!isOnSolidGround) {
+                guard.guardintY += guard.guardSpeed;
+                guard.guardState = "falling";
+                return;
+            } else {
+                guard.guardState = "grounded";
+            }
+            if (isOnSolidGround) {
+                if (objPlayer.playerIntX < guard.guardintX) {
+                    guard.guardintX -= guard.guardSpeed; 
+                }
+                if (objPlayer.playerIntX > guard.guardintX) {
+                    guard.guardintX += guard.guardSpeed;
+                }
+            }
+        }
+    });
+}
+
+//demarrer le mouvement quand le joueur bouge
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { 
+        lstGuards.forEach(guard => {
+            guard.guardState = "grounded"; // Use '=' instead of '=='
+        });
+    }
+});
