@@ -84,6 +84,14 @@ function getGuardBox(){
 // }
 
 function updateGuards() {
+        //demarrer le mouvement quand le joueur bouge
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { 
+            lstGuards.forEach(guard => {
+                guard.guardState = "grounded"; // Use '=' instead of '=='
+            });
+        }
+    });
     lstGuards.forEach(guard => {
         if (guard.guardState !== "freeze") {
             // Convert guard position to grid coordinates
@@ -114,11 +122,3 @@ function updateGuards() {
     });
 }
 
-//demarrer le mouvement quand le joueur bouge
-document.addEventListener('keydown', (event) => {
-    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { 
-        lstGuards.forEach(guard => {
-            guard.guardState = "grounded"; // Use '=' instead of '=='
-        });
-    }
-});
