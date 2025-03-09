@@ -10,8 +10,8 @@
     />
     <script src="map.js"></script>
     <script src="ui.js"></script>
-    <script src="player.js"></script>
     <script src="timer.js"></script>
+    <script src="player.js"></script>
     <script src="guards.js"></script>
     <script>
       var objCanvas = null;
@@ -24,16 +24,17 @@
       var mapHeight = null;
       var objTexture = null;
       var tabObjWalls = null;
-      var spawnX = 946;
-      var spawnY = 996;
+      var PspawnX = null;
+      var PspawnY = null;
+      var GspawnX = 0;
+      var GspawnY = 0;
       var intGold = null;
 
       var objImgPlayer = null;
       var objPlayer = null;
 
       var objImgGuard = null;
-      var objGuard = null;
-      var numGuard = null;
+      var numGuards = 3;
 
       var strMembers = null;
       var strTitle = null;
