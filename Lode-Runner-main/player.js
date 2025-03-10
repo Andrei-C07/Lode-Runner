@@ -52,7 +52,9 @@ function getPlayerBox() {
         left: objPlayer.playerIntX,
         right: objPlayer.playerIntX + objPlayer.width,
         top: objPlayer.playerIntY,
-        bottom: objPlayer.playerIntY + objPlayer.height
+        bottom: objPlayer.playerIntY + objPlayer.height,
+        width: objPlayer.width,
+        //height: objPlayer.height //maybe??
     };
 }
 
@@ -243,7 +245,14 @@ function isOnLadder() {
     for (let row = startRow; row <= endRow; row++) {
         for (let col = startCol; col <= endCol; col++) {
             if (map[row][col] === "l") {
-                return true;
+                //tu prends le centre de l'echelle et le centre du joueur
+                let ladderCentre = OFFSET_X + col * tileWidth + tileWidth / 2; // + tileWidth / 2 obtient la position X du centre de lechelle
+                let playerCentre = playerBox.left + playerBox.width / 2;
+                //
+                //si la distance entre les deux centres est inferieur a 10% de la largeur de la tuile
+                if (Math.abs(ladderCentre - playerCentre) <= tileWidth * 0.1) {
+                    return true;
+                }
             }
         }
     }

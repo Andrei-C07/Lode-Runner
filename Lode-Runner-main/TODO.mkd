@@ -8,7 +8,7 @@ In guard.js :
 
 General :
 - sound
-- climb only when in center of ladder
+- climb only when in center of ladder ✅
 - redo UI.js
 - get rid of tiemr.js. (merge into UI.js)
 - fix gravity. Too focused on only the player.
