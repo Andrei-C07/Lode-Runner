@@ -120,6 +120,7 @@ let holes = [];
 function addHole(row, col) {
     holes.push({ row, col, timer: 8 * 1000 }); 
     map[row][col] = "h"; 
+    make_holeSound.play();
     //console.log(`Dug a hole at (${row}, ${col})`);
 }
 
@@ -132,6 +133,7 @@ function updateHoles() {
             //console.log(`Filling hole at (${holes[i].row}, ${holes[i].col})`);
             map[holes[i].row][holes[i].col] = "b"; 
             holes.splice(i, 1); 
+            fill_holeSound.play();
         }
     }
     dieInHole();
@@ -146,6 +148,7 @@ setInterval(updateHoles, 100);
 function dieInHole() {
     
     if(isInBrick() && objPlayer.playerState !== "dead"){
+        dmgSound.play();
 
         objPlayer.playerState = "dead";
 
@@ -161,10 +164,13 @@ function dieInHole() {
                 objPlayer.playerIntY -= floatingSpeed;
             } else {
                 clearInterval(floatInterval);
-                objPlayer.playerIntX = spawnX;
-                objPlayer.playerIntY = spawnY;
+                objPlayer.playerIntX = PspawnX;
+                objPlayer.playerIntY = PspawnY;
                 objPlayer.playerState = "grounded";
                 strLives --;
+
+                //doit reinitialiser les guardes apres la mort du joueur
+                initGuard();
             }
         }, 30);
     }
@@ -462,12 +468,18 @@ function nextLevel() {
         ["v","v","v","v","v","v","v","v","v","l","v","v","v","v","v","v","v","v","v","v","l","v","v","v","v","v","v","v"],
         ["v","v","v","v","v","v","v","g","v","l","r","r","r","r","r","r","r","r","r","r","l","v","v","v","g","v","v","v"],
         ["v","v","v","v","l","b","b","b","b","b","b","v","v","v","v","v","v","v","v","v","b","b","b","b","b","b","b","l"],
-        ["v","v","v","v","l","v","v","v","v","v","v","v","v","v","v","v","v","v","g","v","v","v","v","v","v","v","v","l"],
+        ["v","v","v","v","l","v","v","v","v","v","v","v","v","v","PS","v","v","v","g","v","v","v","v","v","v","v","v","l"],
         ["b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b","b"],
         ["p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p","p"]
     ];
-    objPlayer.playerIntX = spawnX;
-    objPlayer.playerIntY = spawnY;
+    objPlayer.playerIntX = PspawnX;
+    objPlayer.playerIntY = PspawnY;
+
+    numGuards++;
+    //Pas le choix de faire ceci pour reinitializer les gardes a chaque niveeau
+    initGuard();
+
+    level_upSound.play();
 }
 
 function checkLevelTransition() {

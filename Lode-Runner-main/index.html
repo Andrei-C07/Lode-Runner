@@ -12,7 +12,9 @@
     <script src="ui.js"></script>
     <script src="player.js"></script>
     <script src="guards.js"></script>
+    <audio id="music" src="assets/sounds/music.mp3" loop autoplay></audio>
     <script>
+      music.volume = 0.005;
       var objCanvas = null;
       var objC2D = null;
       var objCycle = null;
@@ -41,6 +43,17 @@
       var strTime = null
       var strLvl = null;
       var strLives = null;
+
+      //les sons
+      var dmgSound = new Audio("assets/sounds/damage.mp3");
+      var fallSound = new Audio("assets/sounds/fall.mp3");
+      var fill_holeSound = new Audio("assets/sounds/fill_hole.mp3");
+      var game_overSound = new Audio("assets/sounds/game_over.mp3");
+      var gold_pickupSound = new Audio("assets/sounds/gold_pickup.mp3");
+      var guard_deathSound = new Audio("assets/sounds/guard_death.mp3");
+      var guard_fallSound = new Audio("assets/sounds/guard_fall.mp3");
+      var level_upSound = new Audio("assets/sounds/level_up.mp3");
+      var make_holeSound = new Audio("assets/sounds/make_hole.mp3");
 
       function initAnimation() {
         objCanvas = document.getElementById("canvas");
