@@ -1,5 +1,5 @@
+
 In player.js :
-- fix rope snapping
 - make animation for runnning, climbing, rope, falling
 
 In guard.js :

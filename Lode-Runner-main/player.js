@@ -289,14 +289,14 @@ function isOnRope() {
         if (gridY >= 0 && gridY < map.length && gridX >= 0 && gridX < map[0].length) {
             if (map[gridY][gridX] === "r") {  
                // console.log(objPlayer.height);
-                let ropeTileBox = getTileBox(gridY, gridX);
+               let ropeTileBox = getTileBox(gridY, gridX);
             
-                let desiredBottom = ropeTileBox.top + tileHeight / 1;
-                let dy = desiredBottom - playerBox.bottom;
-                objPlayer.playerIntY += dy;
-               
-                objPlayer.playerState = "traversingRope";
-                return true;
+               let desiredBottom = ropeTileBox.top + tileHeight / 1;
+               let dy = desiredBottom - playerBox.bottom;
+               objPlayer.playerIntY += dy;
+              
+               objPlayer.playerState = "traversingRope";
+               return true;
             }
         }
     }
