@@ -74,55 +74,30 @@ function getGuardBox(){
     };
 }
 
-// function guardPosOnMap() {
-//     const tileWidth = mapWidth / map[0].length;
-//     const tileHeight = mapHeight / map.length;
-//     let gridX = Math.floor((guard.guardintX - OFFSET_X) / tileWidth);
-//     let gridY = Math.floor((guard.guardintY - OFFSET_Y) / tileHeight);
-//     console.log(`Tile at (${gridX}, ${gridY}): ${map[gridY][gridX]}`);
-//     return { gridX, gridY };
-// }
-
-function updateGuards() {
-        //demarrer le mouvement quand le joueur bouge
-    lstGuards.forEach(guard => {
-        if (guard.guardState !== "freeze") {
-            // Convert guard position to grid coordinates
-            const tileWidth = mapWidth / map[0].length;
-            const tileHeight = mapHeight / map.length;
-            let gridX = Math.floor((guard.guardintX - OFFSET_X) / tileWidth);
-            let gridY = Math.floor((guard.guardintY - OFFSET_Y) / tileHeight);
-
-            let tileBelow = map[gridY + 1] ? map[gridY + 1][gridX] : null;
-            let isOnSolidGround = tileBelow === "b" || tileBelow === "p" || tileBelow === "l";
-
-            if (!isOnSolidGround) {
-                guard.guardintY += guard.guardSpeed;
-                guard.guardState = "falling";
-                guard_fallSound.play();
-                return;
-            } else {
-                guard.guardState = "grounded";
-            }
-            if (isOnSolidGround) {
-                if (objPlayer.playerIntX < guard.guardintX) {
-                    guard.guardintX -= guard.guardSpeed; 
-                }
-                if (objPlayer.playerIntX > guard.guardintX) {
-                    guard.guardintX += guard.guardSpeed;
-                }
-            }
-        }
-    });
-}
-
-function eliminatePlayer(){
+function guardPosOnMap() {
+    const tileWidth = mapWidth / map[0].length;
+    const tileHeight = mapHeight / map.length;
+    let gridX = Math.floor((guard.guardintX - OFFSET_X) / tileWidth);
+    let gridY = Math.floor((guard.guardintY - OFFSET_Y) / tileHeight);
+    return { gridX, gridY };
 }
 
 document.addEventListener('keydown', (event) => {
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { 
         lstGuards.forEach(guard => {
-            guard.guardState = "grounded"; // Use '=' instead of '=='
+            guard.guardState = "grounded";
         });
     }
 });
+
+function updateGuards() {
+        
+    lstGuards.forEach(guard => {
+        if(guard.state === "grounded" || guard.state === "traversingRope"){
+            
+        } 
+    });
+}
+
+function eliminatePlayer(){
+}
