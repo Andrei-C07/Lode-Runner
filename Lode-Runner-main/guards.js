@@ -152,6 +152,8 @@ function updateGuards() {
     });
 }
 
+
+//PROBLEME : le joueur ne peut passer au prochaion niveau car le garde ne drop pas l'or
 function checkGoldGuard() {
     lstGuards.forEach(guard => {
         let { gridX, gridY } = guardPosOnMap(guard);
