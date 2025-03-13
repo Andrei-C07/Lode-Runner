@@ -3,12 +3,50 @@ const OFFSET_X = 50;
 const OFFSET_Y = 100;
 
 // PLAYER INITIALIZATION & DESSIN
-
+function getFlippedImage(img, width, height) {
+    let canevas = document.createElement("canvas");
+    canevas.width = width;
+    canevas.height = height;
+    let objC2D = canevas.getContext("2d");
+    objC2D.translate(width, 0);
+    objC2D.scale(-1, 1);
+    objC2D.drawImage(img, 0, 0, width, height);
+    return canevas;
+}
 function initPlayer() {
+
+    objPlayer = {};
+    objPlayer.frames = { idle: null, run: [] };
+    objPlayer.flippedFrames = { idle: null, run: [] };
+
     objImgPlayer = new Image();
     objImgPlayer.src = "assets/player/playerIDLE.png";
-    objPlayer = new Object();
-    objPlayer.imgPlayer = objImgPlayer;
+    objImgPlayer.onload = function() {
+        objPlayer.frames.idle = objImgPlayer;
+        objPlayer.flippedFrames.idle = getFlippedImage(objImgPlayer, 64, 64);
+        if (!objPlayer.imgPlayer) {
+            objPlayer.imgPlayer = objPlayer.frames.idle;
+        }
+    };
+    let runImg1 = new Image();
+    runImg1.src = "assets/player/playerRunning2.png";
+    runImg1.onload = function() {
+        objPlayer.frames.run[0] = runImg1;
+        objPlayer.flippedFrames.run[0] = getFlippedImage(runImg1, 64, 64);
+    };
+
+    let runImg2 = new Image();
+    runImg2.src = "assets/player/playerRunning3.png";
+    runImg2.onload = function() {
+        objPlayer.frames.run[1] = runImg2;
+        objPlayer.flippedFrames.run[1] = getFlippedImage(runImg2, 64, 64);
+    };
+    
+    objPlayer.currentFrame = 0;
+    objPlayer.animationCounter = 0;
+    objPlayer.isMoving = false;
+    objPlayer.playerDirection = 1; // 1 pour droite, -1 pour gauche
+
     const tileSize = 64;
 
     //initialiser le spawn du joueur
@@ -26,15 +64,16 @@ function initPlayer() {
     objPlayer.playerIntY = PspawnY;
     objPlayer.width = 64;
     objPlayer.height = 64;
-    objPlayer.playerSpeed = 16;
-    objPlayer.playerDirection = 0;
+    objPlayer.playerSpeed = 32;
+    objPlayer.playerDirection = 1;
     objPlayer.playerState = "grounded";
     objPlayer.fallingTimer = 0;
 }
 
 function drawPlayer() {
+    if (!objPlayer.imgPlayer) return; 
     objC2D.save();
-    drawPlayerHitBox();
+    //drawPlayerHitBox();
     objC2D.drawImage(objPlayer.imgPlayer, objPlayer.playerIntX, objPlayer.playerIntY);
     objC2D.restore();
 }
@@ -185,23 +224,27 @@ function dieInHole() {
 function movePlayer() {
     let dx = 0;
     let dy = 0;
-
+    let moving = false;
     if (objPlayer.playerState === "grounded" || objPlayer.playerState === "traversingRope") {
         switch(event.key) {
             case "ArrowRight":
-                
+                moving = true;
                 dx = objPlayer.playerSpeed;
+                objPlayer.playerDirection = 1;
                 break;
             case "ArrowLeft":
-                
+                moving = true;
                 dx = -objPlayer.playerSpeed;
+                objPlayer.playerDirection = -1;
                 break;
             case "ArrowUp":   
                 if (isOnLadder()) 
                     dy = -objPlayer.playerSpeed;
+                moving = true;
                 break;
             case "ArrowDown":
                 dy = objPlayer.playerSpeed;
+                moving = true;
                 break;
             case "x":
                 digHole("right");
@@ -214,10 +257,36 @@ function movePlayer() {
         }
 
     } 
-
+    objPlayer.isMoving = moving;
     updatePlayerPosition(dx, dy);
     checkGoldPickup();
     
+}
+
+function updatePlayerAnimation() {
+    if (objPlayer.playerState === "grounded") {
+        if (objPlayer.isMoving) {
+            objPlayer.animationCounter++;
+            // Change frame every 10 calls (increase this value for a slower animation)
+            if (objPlayer.animationCounter % 30 === 0) {
+                objPlayer.currentFrame = (objPlayer.currentFrame + 1) % objPlayer.frames.run.length;
+                if (objPlayer.playerDirection === -1) {
+                    objPlayer.imgPlayer = objPlayer.flippedFrames.run[objPlayer.currentFrame];
+                } else {
+                    objPlayer.imgPlayer = objPlayer.frames.run[objPlayer.currentFrame];
+                }
+            }
+        } else {
+            // Not moving: set idle image (flip it if facing left)
+            if (objPlayer.playerDirection === -1) {
+                objPlayer.imgPlayer = objPlayer.flippedFrames.idle;
+            } else {
+                objPlayer.imgPlayer = objPlayer.frames.idle;
+            }
+            objPlayer.currentFrame = 0;
+            objPlayer.animationCounter = 0;
+        }
+    }
 }
 
 function isInBrick(){
@@ -438,6 +507,7 @@ function checkGoldPickup() {
         if (map[gridY][gridX] === "g") {
             map[gridY][gridX] = "v";
             miseAJourScore(250);
+            gold_pickupSound.play();
             intGold++;
             if (intGold % 6 === 0) {
                 //console.log("Next level!");

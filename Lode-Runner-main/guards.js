@@ -54,7 +54,7 @@ function initGuard() {
 function drawGuard() {
     objC2D.save();
     lstGuards.forEach(guard => {
-        drawGuardHitBox(guard);
+        //drawGuardHitBox(guard);
         objC2D.drawImage(guard.imgGuard, guard.guardintX, guard.guardintY);
     });
     objC2D.restore();

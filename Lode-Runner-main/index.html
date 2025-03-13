@@ -59,7 +59,7 @@
         objCanvas = document.getElementById("canvas");
         objCanvas.focus();
         objC2D = objCanvas.getContext("2d");
-
+        
         initUI();
         initMap();
         initPlayer();
@@ -86,6 +86,7 @@
       }
 
       function updateAnimation(){
+        updatePlayerAnimation();
         updateGuards();
       }
 
